@@ -13,8 +13,20 @@ import {
   umkm,
   pengaduan,
   apbdes,
+  temaWebsite,
+  dusun,
+  jabatanDesa,
+  runningText,
+  jabatanSotk,
+  dusunSotk,
+  pariwisata,
+  pariwisataReviews,
+  pendidikan,
+  kesehatan,
+  ekonomi,
 } from "@db/schema";
-import { createRouter, publicQuery, adminQuery } from "./middleware";
+import { createRouter, publicQuery, adminQuery, authedQuery } from "./middleware";
+import { sql } from "drizzle-orm";
 
 const db = () => getDb();
 
@@ -908,6 +920,361 @@ const apbdesRouter = createRouter({
 });
 
 // ============================================================
+// Tema Website Router
+// ============================================================
+const temaRouter = createRouter({
+  get: publicQuery.query(async () => {
+    const rows = await db().select().from(temaWebsite).limit(1);
+    return (
+      rows[0] || {
+        statusDesa: "desa",
+        tema: "light",
+        warnaPrimer: "#065f46",
+        warnaSkunder: "#f3f4f6",
+        warnaAccent: "#dc2626",
+        borderRadius: "md",
+        runningTextAktif: 1,
+      }
+    );
+  }),
+
+  update: adminQuery
+    .input(
+      z.object({
+        statusDesa: z.enum(["desa", "kelurahan"]).optional(),
+        tema: z.enum(["light", "dark", "custom"]).optional(),
+        warnaPrimer: z.string().regex(/^#[0-9A-F]{6}$/i).optional(),
+        warnaSkunder: z.string().regex(/^#[0-9A-F]{6}$/i).optional(),
+        warnaAccent: z.string().regex(/^#[0-9A-F]{6}$/i).optional(),
+        backgroundImage1: z.string().optional(),
+        backgroundImage2: z.string().optional(),
+        backgroundImage3: z.string().optional(),
+        backgroundAnimationSpeed: z.number().min(1).max(60).optional(),
+        logoUrl: z.string().optional(),
+        logoKecilUrl: z.string().optional(),
+        faviconUrl: z.string().optional(),
+        runningTextAktif: z.number().optional(),
+        fontFamily: z.string().optional(),
+        borderRadius: z.enum(["none", "sm", "md", "lg", "full"]).optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const existing = await db().select().from(temaWebsite).limit(1);
+      if (existing.length > 0) {
+        await db().update(temaWebsite).set(input);
+        return { ...existing[0], ...input };
+      } else {
+        const result = await db().insert(temaWebsite).values(input as any);
+        return { id: Number((result as any)[0]?.insertId ?? 0), ...input };
+      }
+    }),
+});
+
+// ============================================================
+// Dusun Router
+// ============================================================
+const dusunRouter = createRouter({
+  list: publicQuery.query(async () => {
+    return db().select().from(dusun).orderBy(asc(dusun.urutan));
+  }),
+
+  getById: publicQuery
+    .input(z.object({ id: z.number() }))
+    .query(async ({ input }) => {
+      const rows = await db()
+        .select()
+        .from(dusun)
+        .where(eq(dusun.id, input.id));
+      return rows[0] || null;
+    }),
+
+  create: adminQuery
+    .input(
+      z.object({
+        nama: z.string().min(1).max(255),
+        deskripsi: z.string().optional(),
+        kepala: z.string().optional(),
+        kontak: z.string().optional(),
+        urutan: z.number().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const result = await db().insert(dusun).values(input);
+      return { id: Number((result as any)[0]?.insertId ?? 0), ...input };
+    }),
+
+  update: adminQuery
+    .input(
+      z.object({
+        id: z.number(),
+        nama: z.string().min(1).max(255).optional(),
+        deskripsi: z.string().optional(),
+        kepala: z.string().optional(),
+        kontak: z.string().optional(),
+        urutan: z.number().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const { id, ...data } = input;
+      await db().update(dusun).set(data).where(eq(dusun.id, id));
+      return { id, ...data };
+    }),
+
+  delete: adminQuery
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      await db().delete(dusun).where(eq(dusun.id, input.id));
+      return { success: true };
+    }),
+});
+
+// ============================================================
+// Jabatan Desa Router
+// ============================================================
+const jabatanRouter = createRouter({
+  list: publicQuery.query(async () => {
+    return db().select().from(jabatanDesa).orderBy(asc(jabatanDesa.urutan));
+  }),
+
+  getById: publicQuery
+    .input(z.object({ id: z.number() }))
+    .query(async ({ input }) => {
+      const rows = await db()
+        .select()
+        .from(jabatanDesa)
+        .where(eq(jabatanDesa.id, input.id));
+      return rows[0] || null;
+    }),
+
+  create: adminQuery
+    .input(
+      z.object({
+        nama: z.string().min(1).max(255),
+        pejabat: z.string().min(1).max(255),
+        fotoUrl: z.string().optional(),
+        deskripsi: z.string().optional(),
+        urutan: z.number().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const result = await db().insert(jabatanDesa).values(input);
+      return { id: Number((result as any)[0]?.insertId ?? 0), ...input };
+    }),
+
+  update: adminQuery
+    .input(
+      z.object({
+        id: z.number(),
+        nama: z.string().min(1).max(255).optional(),
+        pejabat: z.string().min(1).max(255).optional(),
+        fotoUrl: z.string().optional(),
+        deskripsi: z.string().optional(),
+        urutan: z.number().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const { id, ...data } = input;
+      await db().update(jabatanDesa).set(data).where(eq(jabatanDesa.id, id));
+      return { id, ...data };
+    }),
+
+  delete: adminQuery
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      await db().delete(jabatanDesa).where(eq(jabatanDesa.id, input.id));
+      return { success: true };
+    }),
+});
+
+// ============================================================
+// Running Text Router
+// ============================================================
+const runningTextRouter = createRouter({
+  list: publicQuery.query(async () => {
+    return db().select().from(runningText).where(eq(runningText.aktif, 1)).orderBy(asc(runningText.urutan));
+  }),
+
+  getAll: adminQuery.query(async () => {
+    return db().select().from(runningText).orderBy(asc(runningText.urutan));
+  }),
+
+  getById: publicQuery
+    .input(z.object({ id: z.number() }))
+    .query(async ({ input }) => {
+      const rows = await db()
+        .select()
+        .from(runningText)
+        .where(eq(runningText.id, input.id));
+      return rows[0] || null;
+    }),
+
+  create: adminQuery
+    .input(
+      z.object({
+        teks: z.string().min(1),
+        warna: z.string().regex(/^#[0-9A-F]{6}$/i).optional(),
+        backgroundColor: z.string().regex(/^#[0-9A-F]{6}$/i).optional(),
+        kecepatan: z.number().optional(),
+        aktif: z.number().optional(),
+        urutan: z.number().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const result = await db().insert(runningText).values(input);
+      return { id: Number((result as any)[0]?.insertId ?? 0), ...input };
+    }),
+
+  update: adminQuery
+    .input(
+      z.object({
+        id: z.number(),
+        teks: z.string().optional(),
+        warna: z.string().regex(/^#[0-9A-F]{6}$/i).optional(),
+        backgroundColor: z.string().regex(/^#[0-9A-F]{6}$/i).optional(),
+        kecepatan: z.number().optional(),
+        aktif: z.number().optional(),
+        urutan: z.number().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const { id, ...data } = input;
+      await db().update(runningText).set(data).where(eq(runningText.id, id));
+      return { id, ...data };
+    }),
+
+  delete: adminQuery
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      await db().delete(runningText).where(eq(runningText.id, input.id));
+      return { success: true };
+    }),
+});
+
+// ============================================================
+// SOTK (Struktur Organisasi) - Jabatan Router
+// ============================================================
+const jabatanSotkRouter = createRouter({
+  list: publicQuery.query(async () => {
+    return db()
+      .select()
+      .from(jabatanSotk)
+      .orderBy(asc(jabatanSotk.urutan));
+  }),
+
+  getById: publicQuery
+    .input(z.object({ id: z.number() }))
+    .query(async ({ input }) => {
+      const rows = await db()
+        .select()
+        .from(jabatanSotk)
+        .where(eq(jabatanSotk.id, input.id));
+      return rows[0] || null;
+    }),
+
+  create: adminQuery
+    .input(
+      z.object({
+        namaJabatan: z.string().min(1),
+        pejabatNama: z.string().min(1),
+        fotoUrl: z.string().optional(),
+        deskripsi: z.string().optional(),
+        parentId: z.number().nullable().optional(),
+        urutan: z.number().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const result = await db().insert(jabatanSotk).values(input);
+      return { id: Number((result as any)[0]?.insertId ?? 0), ...input };
+    }),
+
+  update: adminQuery
+    .input(
+      z.object({
+        id: z.number(),
+        namaJabatan: z.string().optional(),
+        pejabatNama: z.string().optional(),
+        fotoUrl: z.string().optional(),
+        deskripsi: z.string().optional(),
+        parentId: z.number().nullable().optional(),
+        urutan: z.number().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const { id, ...data } = input;
+      await db().update(jabatanSotk).set(data).where(eq(jabatanSotk.id, id));
+      return { id, ...data };
+    }),
+
+  delete: adminQuery
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      await db().delete(jabatanSotk).where(eq(jabatanSotk.id, input.id));
+      return { success: true };
+    }),
+});
+
+// ============================================================
+// SOTK (Struktur Organisasi) - Dusun Router
+// ============================================================
+const dusunSotkRouter = createRouter({
+  list: publicQuery.query(async () => {
+    return db()
+      .select()
+      .from(dusunSotk)
+      .orderBy(asc(dusunSotk.urutan));
+  }),
+
+  getById: publicQuery
+    .input(z.object({ id: z.number() }))
+    .query(async ({ input }) => {
+      const rows = await db()
+        .select()
+        .from(dusunSotk)
+        .where(eq(dusunSotk.id, input.id));
+      return rows[0] || null;
+    }),
+
+  create: adminQuery
+    .input(
+      z.object({
+        namaDusun: z.string().min(1),
+        kepala: z.string().min(1),
+        fotoKepala: z.string().optional(),
+        deskripsi: z.string().optional(),
+        urutan: z.number().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const result = await db().insert(dusunSotk).values(input);
+      return { id: Number((result as any)[0]?.insertId ?? 0), ...input };
+    }),
+
+  update: adminQuery
+    .input(
+      z.object({
+        id: z.number(),
+        namaDusun: z.string().optional(),
+        kepala: z.string().optional(),
+        fotoKepala: z.string().optional(),
+        deskripsi: z.string().optional(),
+        urutan: z.number().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const { id, ...data } = input;
+      await db().update(dusunSotk).set(data).where(eq(dusunSotk.id, id));
+      return { id, ...data };
+    }),
+
+  delete: adminQuery
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      await db().delete(dusunSotk).where(eq(dusunSotk.id, input.id));
+      return { success: true };
+    }),
+});
+
+// ============================================================
 // Dashboard Router (for admin statistics)
 // ============================================================
 const dashboardRouter = createRouter({
@@ -946,6 +1313,511 @@ const dashboardRouter = createRouter({
 });
 
 // ============================================================
+// Pariwisata (Tourism) Router
+// ============================================================
+const pariwisataRouter = createRouter({
+  list: publicQuery.query(async () => {
+    return db()
+      .select()
+      .from(pariwisata)
+      .orderBy(asc(pariwisata.urutan));
+  }),
+
+  reviews: createRouter({
+    listByPariwisataId: publicQuery
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        return db()
+          .select()
+          .from(pariwisataReviews)
+          .where(eq(pariwisataReviews.pariwisataId, input.id))
+          .orderBy(desc(pariwisataReviews.createdAt));
+      }),
+
+    create: authedQuery
+      .input(
+        z.object({
+          id: z.number(),
+          rating: z.number().min(1).max(5),
+          review: z.string().min(1).max(2000),
+        }),
+      )
+      .mutation(async ({ input, ctx }) => {
+        const user = ctx.user;
+        const unionId = user?.unionId;
+        if (!unionId) {
+          throw new Error("Missing user unionId");
+        }
+
+        // prevent spam: allow only one review per user per pariwisata
+        const existing = await db()
+          .select()
+          .from(pariwisataReviews)
+          .where(
+            and(
+              eq(pariwisataReviews.pariwisataId, input.id),
+              eq(pariwisataReviews.unionId, unionId),
+            ),
+          )
+          .limit(1);
+
+        if (existing.length > 0) {
+          await db()
+            .update(pariwisataReviews)
+            .set({
+              rating: input.rating,
+              review: input.review,
+            })
+            .where(eq(pariwisataReviews.id, existing[0].id));
+        } else {
+          await db().insert(pariwisataReviews).values({
+            pariwisataId: input.id,
+            userId: user?.id,
+            unionId,
+            rating: input.rating,
+            review: input.review,
+          });
+        }
+
+        // recompute pariwisata rating (average)
+        const rows = await db()
+          .select({ avgRating: sql<number>`AVG(${pariwisataReviews.rating})` })
+          .from(pariwisataReviews)
+          .where(eq(pariwisataReviews.pariwisataId, input.id));
+        const avg = rows[0]?.avgRating ?? null;
+
+        await db()
+          .update(pariwisata)
+          .set({ rating: avg })
+          .where(eq(pariwisata.id, input.id));
+
+        return { success: true };
+      }),
+  }),
+
+  getById: publicQuery
+    .input(z.object({ id: z.number() }))
+    .query(async ({ input }) => {
+      const rows = await db()
+        .select()
+        .from(pariwisata)
+        .where(eq(pariwisata.id, input.id));
+      return rows[0] || null;
+    }),
+
+  create: adminQuery
+    .input(
+      z.object({
+        namaPenginapan: z.string().min(1),
+        alamat: z.string().min(1),
+        latitude: z.string().optional(),
+        longitude: z.string().optional(),
+        deskripsi: z.string().optional(),
+        fotoPenginapan: z.array(z.string()).default([]),
+        kontakWhatsapp: z.string().optional(),
+        hargaMin: z.string().optional(),
+        hargaMax: z.string().optional(),
+        satuanHarga: z.string().default("per malam"),
+        fasilitas: z.array(z.string()).default([]),
+        rating: z.string().optional(),
+        urutan: z.number().default(0),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const result = await db()
+        .insert(pariwisata)
+        .values({
+          ...input,
+          latitude: input.latitude ? input.latitude : undefined,
+          longitude: input.longitude ? input.longitude : undefined,
+          hargaMin: input.hargaMin ? input.hargaMin : undefined,
+          hargaMax: input.hargaMax ? input.hargaMax : undefined,
+          rating: input.rating ? input.rating : undefined,
+        });
+      return { id: Number((result as any)[0]?.insertId ?? 0), ...input };
+    }),
+
+  update: adminQuery
+    .input(
+      z.object({
+        id: z.number(),
+        namaPenginapan: z.string().optional(),
+        alamat: z.string().optional(),
+        latitude: z.string().optional(),
+        longitude: z.string().optional(),
+        deskripsi: z.string().optional(),
+        fotoPenginapan: z.array(z.string()).optional(),
+        kontakWhatsapp: z.string().optional(),
+        hargaMin: z.string().optional(),
+        hargaMax: z.string().optional(),
+        satuanHarga: z.string().optional(),
+        fasilitas: z.array(z.string()).optional(),
+        rating: z.string().optional(),
+        urutan: z.number().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const { id, ...data } = input;
+      await db().update(pariwisata).set(data).where(eq(pariwisata.id, id));
+      return { success: true };
+    }),
+
+  delete: adminQuery
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      await db().delete(pariwisata).where(eq(pariwisata.id, input.id));
+      return { success: true };
+    }),
+});
+
+// ============================================================
+// Pendidikan (Education) Router
+// ============================================================
+const pendidikanRouter = createRouter({
+  list: publicQuery.query(async () => {
+    return db()
+      .select()
+      .from(pendidikan)
+      .orderBy(asc(pendidikan.urutan));
+  }),
+
+  getById: publicQuery
+    .input(z.object({ id: z.number() }))
+    .query(async ({ input }) => {
+      const rows = await db()
+        .select()
+        .from(pendidikan)
+        .where(eq(pendidikan.id, input.id));
+      return rows[0] || null;
+    }),
+
+  getByJenjang: publicQuery
+    .input(z.object({ jenjang: z.string() }))
+    .query(async ({ input }) => {
+      return db()
+        .select()
+        .from(pendidikan)
+        .where(eq(pendidikan.jenjang, input.jenjang as any))
+        .orderBy(asc(pendidikan.urutan));
+    }),
+
+  create: adminQuery
+    .input(
+      z.object({
+        namaSarana: z.string().min(1),
+        jenjang: z.enum([
+          "paud",
+          "tk",
+          "sd",
+          "smp",
+          "sma",
+          "smk",
+          "d1",
+          "d2",
+          "d3",
+          "d4",
+          "s1",
+          "s2",
+          "s3",
+        ]),
+        alamat: z.string().min(1),
+        latitude: z.string().optional(),
+        longitude: z.string().optional(),
+        kepala: z.string().optional(),
+        kontakNomor: z.string().optional(),
+        kontakEmail: z.string().optional(),
+        deskripsi: z.string().optional(),
+        fotoUrl: z.string().optional(),
+        jumlahGuru: z.number().optional(),
+        jumlahSiswa: z.number().optional(),
+        tahunBerdiri: z.number().optional(),
+        statusAkreditasi: z.string().optional(),
+        urutan: z.number().default(0),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const result = await db().insert(pendidikan).values(input);
+      return { id: Number((result as any)[0]?.insertId ?? 0), ...input };
+    }),
+
+  update: adminQuery
+    .input(
+      z.object({
+        id: z.number(),
+        namaSarana: z.string().optional(),
+        jenjang: z
+          .enum([
+            "paud",
+            "tk",
+            "sd",
+            "smp",
+            "sma",
+            "smk",
+            "d1",
+            "d2",
+            "d3",
+            "d4",
+            "s1",
+            "s2",
+            "s3",
+          ])
+          .optional(),
+        alamat: z.string().optional(),
+        latitude: z.string().optional(),
+        longitude: z.string().optional(),
+        kepala: z.string().optional(),
+        kontakNomor: z.string().optional(),
+        kontakEmail: z.string().optional(),
+        deskripsi: z.string().optional(),
+        fotoUrl: z.string().optional(),
+        jumlahGuru: z.number().optional(),
+        jumlahSiswa: z.number().optional(),
+        tahunBerdiri: z.number().optional(),
+        statusAkreditasi: z.string().optional(),
+        urutan: z.number().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const { id, ...data } = input;
+      await db().update(pendidikan).set(data).where(eq(pendidikan.id, id));
+      return { success: true };
+    }),
+
+  delete: adminQuery
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      await db().delete(pendidikan).where(eq(pendidikan.id, input.id));
+      return { success: true };
+    }),
+});
+
+// ============================================================
+// Kesehatan (Health) Router
+// ============================================================
+const kesehatanRouter = createRouter({
+  list: publicQuery.query(async () => {
+    return db()
+      .select()
+      .from(kesehatan)
+      .orderBy(asc(kesehatan.urutan));
+  }),
+
+  getById: publicQuery
+    .input(z.object({ id: z.number() }))
+    .query(async ({ input }) => {
+      const rows = await db()
+        .select()
+        .from(kesehatan)
+        .where(eq(kesehatan.id, input.id));
+      return rows[0] || null;
+    }),
+
+  getByJenis: publicQuery
+    .input(z.object({ jenis: z.string() }))
+    .query(async ({ input }) => {
+      return db()
+        .select()
+        .from(kesehatan)
+        .where(eq(kesehatan.jenis, input.jenis as any))
+        .orderBy(asc(kesehatan.urutan));
+    }),
+
+  create: adminQuery
+    .input(
+      z.object({
+        namaSarana: z.string().min(1),
+        jenis: z.enum([
+          "puskesmas",
+          "poliklinik",
+          "rumah_sakit",
+          "apotek",
+          "klinik",
+          "posyandu",
+          "praktik_dokter",
+          "praktik_bidan",
+        ]),
+        alamat: z.string().min(1),
+        latitude: z.string().optional(),
+        longitude: z.string().optional(),
+        pimpinan: z.string().optional(),
+        kontakNomor: z.string().optional(),
+        kontakEmail: z.string().optional(),
+        deskripsi: z.string().optional(),
+        fotoUrl: z.string().optional(),
+        jamBuka: z.string().optional(),
+        jamTutup: z.string().optional(),
+        layanan: z.array(z.string()).default([]),
+        urutan: z.number().default(0),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const result = await db().insert(kesehatan).values(input);
+      return { id: Number((result as any)[0]?.insertId ?? 0), ...input };
+    }),
+
+  update: adminQuery
+    .input(
+      z.object({
+        id: z.number(),
+        namaSarana: z.string().optional(),
+        jenis: z
+          .enum([
+            "puskesmas",
+            "poliklinik",
+            "rumah_sakit",
+            "apotek",
+            "klinik",
+            "posyandu",
+            "praktik_dokter",
+            "praktik_bidan",
+          ])
+          .optional(),
+        alamat: z.string().optional(),
+        latitude: z.string().optional(),
+        longitude: z.string().optional(),
+        pimpinan: z.string().optional(),
+        kontakNomor: z.string().optional(),
+        kontakEmail: z.string().optional(),
+        deskripsi: z.string().optional(),
+        fotoUrl: z.string().optional(),
+        jamBuka: z.string().optional(),
+        jamTutup: z.string().optional(),
+        layanan: z.array(z.string()).optional(),
+        urutan: z.number().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const { id, ...data } = input;
+      await db().update(kesehatan).set(data).where(eq(kesehatan.id, id));
+      return { success: true };
+    }),
+
+  delete: adminQuery
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      await db().delete(kesehatan).where(eq(kesehatan.id, input.id));
+      return { success: true };
+    }),
+});
+
+// ============================================================
+// Ekonomi (Economic) Router
+// ============================================================
+const ekonomiRouter = createRouter({
+  list: publicQuery.query(async () => {
+    return db()
+      .select()
+      .from(ekonomi)
+      .orderBy(asc(ekonomi.urutan));
+  }),
+
+  getById: publicQuery
+    .input(z.object({ id: z.number() }))
+    .query(async ({ input }) => {
+      const rows = await db()
+        .select()
+        .from(ekonomi)
+        .where(eq(ekonomi.id, input.id));
+      return rows[0] || null;
+    }),
+
+  getByJenis: publicQuery
+    .input(z.object({ jenis: z.string() }))
+    .query(async ({ input }) => {
+      return db()
+        .select()
+        .from(ekonomi)
+        .where(eq(ekonomi.jenis, input.jenis as any))
+        .orderBy(asc(ekonomi.urutan));
+    }),
+
+  create: adminQuery
+    .input(
+      z.object({
+        namaSarana: z.string().min(1),
+        jenis: z.enum([
+          "pasar",
+          "toko",
+          "koperasi",
+          "bank",
+          "bpr",
+          "lkm",
+          "bmt",
+          "unit_desa",
+          "industri_kecil",
+          "pertanian",
+          "perternakan",
+          "perikanan",
+        ]),
+        alamat: z.string().min(1),
+        latitude: z.string().optional(),
+        longitude: z.string().optional(),
+        pimpinan: z.string().optional(),
+        kontakNomor: z.string().optional(),
+        kontakEmail: z.string().optional(),
+        deskripsi: z.string().optional(),
+        fotoUrl: z.string().optional(),
+        jamBuka: z.string().optional(),
+        jamTutup: z.string().optional(),
+        produk: z.array(z.string()).default([]),
+        urutan: z.number().default(0),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const result = await db().insert(ekonomi).values(input);
+      return { id: Number((result as any)[0]?.insertId ?? 0), ...input };
+    }),
+
+  update: adminQuery
+    .input(
+      z.object({
+        id: z.number(),
+        namaSarana: z.string().optional(),
+        jenis: z
+          .enum([
+            "pasar",
+            "toko",
+            "koperasi",
+            "bank",
+            "bpr",
+            "lkm",
+            "bmt",
+            "unit_desa",
+            "industri_kecil",
+            "pertanian",
+            "perternakan",
+            "perikanan",
+          ])
+          .optional(),
+        alamat: z.string().optional(),
+        latitude: z.string().optional(),
+        longitude: z.string().optional(),
+        pimpinan: z.string().optional(),
+        kontakNomor: z.string().optional(),
+        kontakEmail: z.string().optional(),
+        deskripsi: z.string().optional(),
+        fotoUrl: z.string().optional(),
+        jamBuka: z.string().optional(),
+        jamTutup: z.string().optional(),
+        produk: z.array(z.string()).optional(),
+        urutan: z.number().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const { id, ...data } = input;
+      await db().update(ekonomi).set(data).where(eq(ekonomi.id, id));
+      return { success: true };
+    }),
+
+  delete: adminQuery
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input }) => {
+      await db().delete(ekonomi).where(eq(ekonomi.id, input.id));
+      return { success: true };
+    }),
+});
+
+// ============================================================
 // Main Router Export
 // ============================================================
 export const desaRouter = createRouter({
@@ -960,5 +1832,15 @@ export const desaRouter = createRouter({
   umkm: umkmRouter,
   pengaduan: pengaduanRouter,
   apbdes: apbdesRouter,
+  tema: temaRouter,
+  dusun: dusunRouter,
+  jabatan: jabatanRouter,
+  runningText: runningTextRouter,
+  jabatanSotk: jabatanSotkRouter,
+  dusunSotk: dusunSotkRouter,
+  pariwisata: pariwisataRouter,
+  pendidikan: pendidikanRouter,
+  kesehatan: kesehatanRouter,
+  ekonomi: ekonomiRouter,
   dashboard: dashboardRouter,
 });

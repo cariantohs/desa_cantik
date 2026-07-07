@@ -9,9 +9,83 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Save, Settings, MapPin, Phone, Share2 } from "lucide-react";
+import {
+  Save,
+  Settings,
+  MapPin,
+  Phone,
+  Share2,
+  RotateCcw,
+  ThermometerSun,
+  Droplets,
+  Wind,
+} from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+
+function safeParseJson<T = any>(raw: string, fallback: T): T {
+  try {
+    if (!raw) return fallback;
+    return JSON.parse(raw) as T;
+  } catch {
+    return fallback;
+  }
+}
+
+function extractLatLonFromGeografis(geografisRaw: string): { lat?: number; lon?: number } {
+  const g = safeParseJson<Record<string, any>>(geografisRaw, {});
+  const candidates: Array<[string, string]> = [
+    ["latitude", "longitude"],
+    ["lat", "lon"],
+    ["lat", "lng"],
+    ["koordinat_lat", "koordinat_lon"],
+    ["koordinat", "koordinat"],
+  ];
+
+  // direct candidates
+  for (const [latKey, lonKey] of candidates) {
+    const latVal = g?.[latKey];
+    const lonVal = g?.[lonKey];
+    if (latVal !== undefined && lonVal !== undefined) {
+      const latNum = typeof latVal === "string" ? Number(latVal) : latVal;
+      const lonNum = typeof lonVal === "string" ? Number(lonVal) : lonVal;
+      if (Number.isFinite(latNum) && Number.isFinite(lonNum)) {
+        return { lat: latNum, lon: lonNum };
+      }
+    }
+  }
+
+  // nested iklim
+  const iklim = g?.iklim;
+  if (iklim && typeof iklim === "object") {
+    const latVal = iklim?.lat ?? iklim?.latitude;
+    const lonVal = iklim?.lon ?? iklim?.longitude ?? iklim?.lng;
+    const latNum = typeof latVal === "string" ? Number(latVal) : latVal;
+    const lonNum = typeof lonVal === "string" ? Number(lonVal) : lonVal;
+    if (Number.isFinite(latNum) && Number.isFinite(lonNum)) {
+      return { lat: latNum, lon: lonNum };
+    }
+  }
+
+  return {};
+}
+
+function weatherCodeToText(code: number | null | undefined) {
+  const c = code ?? 0;
+  // Open-Meteo: https://open-meteo.com/en/docs
+  if (c === 0) return "Cerah";
+  if (c === 1) return "Utamanya cerah";
+  if (c === 2) return "Sedikit berawan";
+  if (c === 3) return "Berawan";
+  if (c === 45 || c === 48) return "Kabut";
+  if (c >= 51 && c <= 57) return "Gerimis";
+  if (c >= 61 && c <= 67) return "Hujan ringan";
+  if (c >= 71 && c <= 77) return "Salju/Es";
+  if (c >= 80 && c <= 82) return "Hujan deras";
+  if (c >= 85 && c <= 86) return "Hujan salju/Es";
+  if (c >= 95) return "Petir";
+  return "Cuaca";
+}
 
 export default function AdminProfil() {
   const utils = trpc.useUtils();
@@ -26,35 +100,152 @@ export default function AdminProfil() {
   });
 
   const [form, setForm] = useState<Record<string, string>>({});
+  const [climate, setClimate] = useState<{
+    loading: boolean;
+    error?: string;
+    data?: {
+      temperature_2m: number;
+      apparent_temperature: number;
+      relative_humidity_2m: number;
+      wind_speed_10m: number;
+      wind_direction_10m: number;
+      weather_code: number;
+    };
+    lastUpdated?: string;
+  }>({ loading: false });
+
+  const [manualLat, setManualLat] = useState<string>("");
+  const [manualLon, setManualLon] = useState<string>("");
 
   useEffect(() => {
-    if (profil) {
-      setForm({
-        nama_desa: profil.nama_desa || "",
-        kecamatan: profil.kecamatan || "",
-        kabupaten: profil.kabupaten || "",
-        provinsi: profil.provinsi || "",
-        kode_pos: profil.kode_pos || "",
-        visi: profil.visi || "",
-        misi: profil.misi || "[]",
-        sejarah: profil.sejarah || "",
-        geografis: profil.geografis || "{}",
-        kontak_wa: profil.kontak_wa || "",
-        kontak_email: profil.kontak_email || "",
-        kontak_telepon: profil.kontak_telepon || "",
-        medsos: profil.medsos || "{}",
-        google_maps_embed: profil.google_maps_embed || "",
-        footer_teks: profil.footer_teks || "",
-        footer_logo_url: profil.footer_logo_url || "",
-        layanan_mandiri_url: profil.layanan_mandiri_url || "",
-        logo_url: profil.logo_url || "",
-      });
-    }
+    if (!profil) return;
+
+    // Extract existing lat/lon (if available) from geografis JSON,
+    // so the dedicated inputs are prefilled.
+    const { lat, lon } = extractLatLonFromGeografis(
+      profil.geografis || "{}"
+    );
+
+    setManualLat(lat !== undefined ? String(lat) : "");
+    setManualLon(lon !== undefined ? String(lon) : "");
+
+    setForm({
+      nama_desa: profil.nama_desa || "",
+      kecamatan: profil.kecamatan || "",
+      kabupaten: profil.kabupaten || "",
+      provinsi: profil.provinsi || "",
+      kode_pos: profil.kode_pos || "",
+      visi: profil.visi || "",
+      misi: profil.misi || "[]",
+      sejarah: profil.sejarah || "",
+      geografis: profil.geografis || "{}",
+      kontak_wa: profil.kontak_wa || "",
+      kontak_email: profil.kontak_email || "",
+      kontak_telepon: profil.kontak_telepon || "",
+      medsos: profil.medsos || "{}",
+      google_maps_embed: profil.google_maps_embed || "",
+      footer_teks: profil.footer_teks || "",
+      footer_logo_url: profil.footer_logo_url || "",
+      layanan_mandiri_url: profil.layanan_mandiri_url || "",
+      logo_url: profil.logo_url || "",
+    });
   }, [profil]);
+
+  useEffect(() => {
+    const lat = Number(manualLat);
+    const lon = Number(manualLon);
+
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
+
+    let cancelled = false;
+
+    const run = async () => {
+      if (cancelled) return;
+      // Avoid overlapping fetches if current request still loading
+      if (climate.loading) return;
+      await fetchClimate(lat, lon);
+    };
+
+    // fetch once immediately
+    run();
+
+    const id = window.setInterval(() => {
+      run();
+    }, 15000);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(id);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [manualLat, manualLon, climate.loading]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setProfil.mutate(form);
+
+    // Persist dedicated lat/lon into geografis JSON
+    const lat = manualLat.trim() !== "" ? Number(manualLat) : undefined;
+    const lon = manualLon.trim() !== "" ? Number(manualLon) : undefined;
+
+    const hasValidLatLon =
+      lat !== undefined &&
+      lon !== undefined &&
+      Number.isFinite(lat) &&
+      Number.isFinite(lon);
+
+    const nextForm: Record<string, string> = { ...form };
+
+    if (hasValidLatLon) {
+      nextForm.geografis = JSON.stringify({
+        latitude: lat,
+        longitude: lon,
+      });
+    }
+
+    setProfil.mutate(nextForm);
+  };
+
+  const fetchClimate = async (lat: number, lon: number) => {
+    try {
+      setClimate({ loading: true, error: undefined });
+
+      const url = new URL("https://api.open-meteo.com/v1/forecast");
+      url.searchParams.set("latitude", String(lat));
+      url.searchParams.set("longitude", String(lon));
+      url.searchParams.set(
+        "current",
+        "temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m"
+      );
+      url.searchParams.set("timezone", "Asia/Singapore");
+
+      const res = await fetch(url.toString());
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+      const json = await res.json();
+
+      const cur = json?.current;
+      if (!cur) throw new Error("Response cuaca tidak valid");
+
+      setClimate({
+        loading: false,
+        data: {
+          temperature_2m: Number(cur.temperature_2m),
+          apparent_temperature: Number(cur.apparent_temperature),
+          relative_humidity_2m: Number(cur.relative_humidity_2m),
+          wind_speed_10m: Number(cur.wind_speed_10m),
+          wind_direction_10m: Number(cur.wind_direction_10m),
+          weather_code: Number(cur.weather_code),
+        },
+        lastUpdated: new Date().toLocaleString(),
+      });
+    } catch (err: any) {
+      setClimate({
+        loading: false,
+        error: err?.message || "Gagal memuat cuaca",
+      });
+      toast.error("Gagal memuat cuaca realtime");
+    }
   };
 
   if (isLoading) {
@@ -284,6 +475,127 @@ export default function AdminProfil() {
             <TabsContent value="lokasi">
               <Card className="border-0 shadow-sm">
                 <CardContent className="p-6 space-y-4">
+                  {/* Realtime Climate */}
+                  <div className="rounded-xl border border-emerald-100 bg-emerald-50 p-4">
+                      <div>
+                        <h2 className="text-base font-semibold text-gray-900">
+                          Iklim (Realtime)
+                        </h2>
+                        <p className="text-sm text-gray-600 mt-1">
+                          Data diambil realtime dari Open‑Meteo (gratis) berdasarkan koordinat desa.
+                        </p>
+                      </div>
+
+                    <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3 items-stretch">
+                      <div className="bg-white rounded-lg border border-emerald-100 p-4 flex flex-col justify-center">
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <ThermometerSun className="w-4 h-4 text-emerald-700" />
+                          Suhu
+                        </div>
+                        <div className="text-4xl font-bold text-gray-900 leading-none mt-1">
+                          {climate.data?.temperature_2m !== undefined
+                            ? `${Math.round(
+                                climate.data.temperature_2m
+                              )}°C`
+                            : climate.loading
+                              ? "—"
+                              : "—"}
+                        </div>
+                        <div className="text-sm text-gray-600 mt-1">
+                          {climate.data?.weather_code !== undefined
+                            ? weatherCodeToText(climate.data.weather_code)
+                            : ""}
+                        </div>
+                      </div>
+
+                      <div className="bg-white rounded-lg border border-emerald-100 p-4 flex flex-col justify-center">
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <Droplets className="w-4 h-4 text-emerald-700" />
+                          Kelembapan
+                        </div>
+                        <div className="text-2xl font-semibold text-gray-900 mt-1">
+                          {climate.data?.relative_humidity_2m !== undefined
+                            ? `${Math.round(climate.data.relative_humidity_2m)}%`
+                            : "—"}
+                        </div>
+                        <div className="text-xs text-gray-500 mt-2">
+                          {climate.data
+                            ? `Sensasi: ${Math.round(
+                                climate.data.apparent_temperature
+                              )}°C`
+                            : ""}
+                        </div>
+                      </div>
+
+                      <div className="bg-white rounded-lg border border-emerald-100 p-4 flex flex-col justify-center">
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <Wind className="w-4 h-4 text-emerald-700" />
+                          Angin
+                        </div>
+                        <div className="text-2xl font-semibold text-gray-900 mt-1">
+                          {climate.data?.wind_speed_10m !== undefined
+                            ? `${Math.round(
+                                climate.data.wind_speed_10m
+                              )} km/jam`
+                            : "—"}
+                        </div>
+                        <div className="text-xs text-gray-500 mt-2">
+                          {climate.data?.wind_direction_10m !== undefined
+                            ? `Arah: ${Math.round(
+                                climate.data.wind_direction_10m
+                              )}°`
+                            : ""}
+                        </div>
+                      </div>
+                    </div>
+
+                    {climate.error && (
+                      <div className="mt-3 text-sm text-red-600">
+                        {climate.error}
+                      </div>
+                    )}
+
+
+                    {/* Manual lat/lon fallback (opsional) */}
+                    <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
+                      <div>
+                        <Label>Lat (opsional)</Label>
+                        <Input
+                          value={manualLat}
+                          onChange={(e) => setManualLat(e.target.value)}
+                          placeholder="e.g. 2.1234"
+                        />
+                      </div>
+                      <div>
+                        <Label>Lon (opsional)</Label>
+                        <Input
+                          value={manualLon}
+                          onChange={(e) => setManualLon(e.target.value)}
+                          placeholder="e.g. 99.5678"
+                        />
+                      </div>
+                      <div className="flex justify-start md:justify-end">
+                        <Button
+                          type="button"
+                          variant="default"
+                          className="bg-emerald-700 hover:bg-emerald-800"
+                          onClick={() => {
+                            const lat = Number(manualLat);
+                            const lon = Number(manualLon);
+                            if (Number.isFinite(lat) && Number.isFinite(lon)) {
+                              fetchClimate(lat, lon);
+                              return;
+                            }
+                            toast.error("Masukkan lat/lon yang valid untuk memuat cuaca.");
+                          }}
+                          disabled={climate.loading}
+                        >
+                          Ambil Cuaca
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+
                   <div>
                     <Label>Data Geografis (JSON)</Label>
                     <Textarea
@@ -292,9 +604,14 @@ export default function AdminProfil() {
                         setForm({ ...form, geografis: e.target.value })
                       }
                       rows={10}
-                      placeholder='{"luas": "", "batas_utara": "", "batas_selatan": "", "batas_barat": "", "batas_timur": "", "ketinggian": "", "iklim": ""}'
+                      placeholder='{"luas": "", "ketinggian": "", "iklim": "", "latitude": -2.1234, "longitude": 99.5678}'
                     />
+                    <p className="text-xs text-gray-500 mt-2">
+                      Disarankan isi: <span className="font-mono">latitude</span> dan{" "}
+                      <span className="font-mono">longitude</span> (atau lat/lon) di JSON agar cuaca otomatis.
+                    </p>
                   </div>
+
                   <div>
                     <Label>Google Maps Embed URL</Label>
                     <Textarea
@@ -308,6 +625,7 @@ export default function AdminProfil() {
                       rows={3}
                     />
                   </div>
+
                   <div>
                     <Label>URL Layanan Mandiri</Label>
                     <Input

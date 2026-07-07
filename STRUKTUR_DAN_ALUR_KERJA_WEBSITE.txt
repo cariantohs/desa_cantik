@@ -1,0 +1,460 @@
+================================================================================
+STRUKTUR LENGKAP DAN ALUR KERJA WEBSITE DESA (PARDOMUAN)
+Program Pembinaan Desa Cantik (Desa Cinta Statistik)
+================================================================================
+
+Dokumen ini berisi penjelasan detail, lengkap, dan sistematis mengenai struktur folder, 
+arsitektur teknologi, skema basis data (database), serta alur kerja (workflow) dari 
+proyek Website Desa Cantik.
+
+--------------------------------------------------------------------------------
+DAFTAR ISI:
+1. Ringkasan Proyek & Teknologi Utama
+2. Arsitektur Hubungan Frontend & Backend
+3. Struktur Lengkap Direktori (Folder & File Utama)
+4. Penjelasan Skema Database (20+ Tabel Penting)
+5. Alur Kerja (Workflow) Sistem
+   A. Proses Bootstrapping & Mode Menjalankan Aplikasi
+   B. Alur Komunikasi Data Typesafe (tRPC)
+   C. Mekanisme Autentikasi & Keamanan Admin
+   D. Alur Dinamis Tema & Kustomisasi Tampilan
+   E. Alur Pengaduan Masyarakat & Tindak Lanjut Admin
+   F. Alur Visualisasi Bagan Organisasi (SOTK)
+   G. Alur Pusat Data & Infografis Demografi Penduduk
+6. Panduan Pengoperasian & Troubleshooting Singkat
+--------------------------------------------------------------------------------
+
+================================================================================
+1. RINGKASAN PROYEK & TEKNOLOGI UTAMA
+================================================================================
+Website Desa Cantik (khususnya instansi Desa Pardomuan) didesain sebagai platform 
+digital multi-desa yang andal, berkinerja tinggi, dan ramah pengguna. Website ini 
+berfungsi sebagai portal informasi dinamis, wadah transparansi APBDes, pusat data 
+demografi kependudukan (statistik), media publikasi, dan sarana pengaduan masyarakat.
+
+Teknologi Utama yang Digunakan:
+- Frontend (Client Side):
+  * React 19: Pustaka JavaScript untuk membangun antarmuka pengguna yang responsif.
+  * React Router v7: Mengelola navigasi halaman (routing) tanpa reload.
+  * Tailwind CSS v3 & Shadcn UI: Framework desain utility-first dan koleksi 
+    komponen UI premium (Radix UI) untuk estetika modern.
+  * Recharts: Pustaka grafik interaktif untuk memvisualisasikan data APBDes dan demografi.
+  * tRPC Client & TanStack Query: Menghubungkan client dengan server secara langsung
+    dengan jaminan tipe data (typesafe), caching otomatis, dan sinkronisasi status.
+
+- Backend (Server Side):
+  * Hono Framework: Kerangka kerja server minimalis yang sangat cepat, berjalan di atas
+    Node.js runtime menggunakan `@hono/node-server`.
+  * tRPC Server: Menyediakan gerbang API typesafe tanpa membutuhkan REST API tradisional.
+  * Drizzle ORM: Object-Relational Mapper modern yang bertindak sebagai jembatan kueri
+    tipe-aman ke database MySQL.
+  * Jose: Penanganan pembuatan dan verifikasi token keamanan JWT (JSON Web Token).
+
+- Database (Basis Data):
+  * MySQL: Basis data relasional standar industri untuk performa query yang stabil.
+
+================================================================================
+2. ARSITEKTUR HUBUNGAN FRONTEND & BACKEND
+================================================================================
+Website ini menggunakan pendekatan monorepo full-stack terintegrasi:
+
+       [ BROWSER / CLIENT ]                   [ SERVER (Node.js + Hono) ]
+   +---------------------------+             +---------------------------+
+   |   React 19 Frontend       |             |  Hono Web Server          |
+   |   - Pages (Home, etc)     |   HTTP      |  - static files server    |
+   |   - tRPC Client hooks     | ------------>  - auth handler (/login)  |
+   |   - Recharts / UI Components| <------------ |  - tRPC Fetch Adapter    |
+   +---------------------------+   (JSON)    +-------------+-------------+
+                 ^                                         |
+                 | (Typesafe definitions shared)           | Drizzle ORM queries
+                 v                                         v
+   +-------------------------------------------------------+-------------+
+   |   MySQL Database (Tabel users, berita, statistik, SOTK, dll)        |
+   +---------------------------------------------------------------------+
+
+Selama masa pengembangan (development):
+Vite Dev Server memfasilitasi HMR (Hot Module Replacement) untuk frontend di port 3000. 
+Plugin `@hono/vite-dev-server` menyisipkan server Hono pada rute `/api/*` untuk 
+menangani semua request backend secara paralel.
+
+Pada lingkungan produksi (production):
+Vite mengompilasi seluruh frontend menjadi file statik HTML/JS/CSS di dalam `dist/public`. 
+Backend Hono di-bundle oleh esbuild menjadi file tunggal `dist/boot.js`. Ketika server 
+dinyalakan (`npm run start`), server Hono bertindak ganda: melayani API di `/api/*` 
+dan menyajikan file statik dari `dist/public` secara mandiri.
+
+================================================================================
+3. STRUKTUR LENGKAP DIREKTORI (FOLDER & FILE UTAMA)
+================================================================================
+Berikut adalah peta struktur folder proyek beserta kegunaannya:
+
+├── api/                            # Backend API (Hono & tRPC)
+│   ├── boot.ts                     # Entry point server Hono & static files server
+│   ├── router.ts                   # Registrasi router utama tRPC
+│   ├── context.ts                  # Context parser tRPC (kredensial, auth token)
+│   ├── middleware.ts               # Autentikasi middleware (public, authed, admin)
+│   ├── auth-router.ts              # Router tRPC untuk autentikasi user
+│   ├── desa-router.ts              # Router tRPC terbesar (CRUD modul-modul desa)
+│   ├── sotk-router.ts              # Router tRPC khusus visualisasi organisasi SOTK
+│   └── lib/                        # Pustaka utilitas (env, token generator, dsb.)
+│
+├── db/                             # Konfigurasi Database & ORM
+│   ├── schema.ts                   # Deklarasi lengkap skema & struktur tabel MySQL
+│   ├── relations.ts                # Definisi relasi antar-tabel database
+│   ├── seed.ts                     # Skrip pembuat data awal (dummy/initial data)
+│   └── migrations/                 # File migrasi SQL hasil auto-generate Drizzle-Kit
+│
+├── src/                            # Frontend Aplikasi (React 19)
+│   ├── main.tsx                    # File inisialisasi awal React DOM
+│   ├── App.tsx                     # Peta routing utama menggunakan React Router
+│   ├── App.css                     # Custom styling khusus komponen React
+│   ├── index.css                   # File CSS global penampung token Tailwind & Shadcn
+│   ├── const.ts                    # Konstanta global sisi client
+│   │
+│   ├── components/                 # Komponen UI Reusable
+│   │   ├── Layout.tsx              # Tata letak umum halaman publik (Navbar & Footer)
+│   │   ├── AdminLayout.tsx         # Tata letak dashboard admin (Sidebar & Konten)
+│   │   ├── Navbar.tsx              # Navigasi utama dengan tema warna dinamis
+│   │   ├── Footer.tsx              # Bagian kaki halaman dengan atribusi BPS
+│   │   ├── RunningText.tsx         # Teks berjalan dinamis di bagian atas/bawah
+│   │   ├── BackgroundCarousel.tsx  # Carousel gambar latar belakang pada Hero section
+│   │   ├── ui/                     # Komponen UI dasar Shadcn (Button, Card, Form, dll)
+│   │   └── sotk/                   # Komponen bagan organisasi interaktif
+│   │       ├── OrganizationalChart.tsx # Bagan pohon utama (pan & zoom)
+│   │       ├── OrgChartCard.tsx    # Kartu jabatan dengan ukuran berdasar hierarki
+│   │       ├── SVGConnectors.tsx   # Penggambar garis lengkung SVG antar jabatan
+│   │       └── treeBuilder.ts      # Algoritma penyusun hierarki data flat menjadi pohon
+│   │
+│   ├── hooks/                      # Custom hooks React
+│   │   ├── useAuth.ts              # Pengelola status login & logout admin
+│   │   └── useSiteMetadata.ts      # Pengatur dinamis Title & Favicon dari DB
+│   │
+│   ├── providers/                  # Context Providers
+│   │   └── trpc.tsx                # Pembungkus provider tRPC client & Query Client
+│   │
+│   └── pages/                      # Halaman-halaman Website
+│       ├── Home.tsx                # Beranda publik (Ringkasan statistik, berita, UMKM)
+│       ├── Berita.tsx              # Halaman list kabar desa dan pengumuman
+│       ├── BeritaDetail.tsx        # Halaman detail isi berita lengkap (menggunakan Slug)
+│       ├── Kontak.tsx              # Halaman kontak, maps, dan form pengaduan langsung
+│       ├── Login.tsx               # Halaman login administrator
+│       ├── ResetPassword.tsx       # Halaman reset kata sandi admin
+│       ├── NotFound.tsx            # Halaman error 404
+│       │
+│       ├── profil/                 # Halaman seputar informasi desa
+│       │   ├── Sejarah.tsx         # Sejarah desa, visi, dan misi
+│       │   ├── Geografis.tsx       # Letak geografis, koordinat, dan widget cuaca
+│       │   ├── Demografi.tsx       # Visualisasi grafik kependudukan & demografi
+│       │   └── Dusun.tsx           # Daftar dusun/lingkungan di wilayah desa
+│       │
+│       ├── pemerintahan/           # Halaman struktur pemerintahan
+│       │   ├── Struktur.tsx        # Penayangan aparatur desa
+│       │   ├── SOTKPage.tsx        # Halaman bagan pohon SOTK interaktif
+│       │   ├── BPD.tsx             # Penjelasan & susunan pengurus BPD
+│       │   └── Lembaga.tsx         # Lembaga kemasyarakatan (PKK, Karang Taruna, LPMD)
+│       │
+│       ├── layanan/                # Layanan masyarakat
+│       │   ├── Panduan.tsx         # Prosedur pengurusan dokumen pelayanan
+│       │   ├── Dokumen.tsx         # Unduhan dokumen publik (format surat, regulasi)
+│       │   └── Mandiri.tsx         # Tautan eksternal ke layanan mandiri desa
+│       │
+│       ├── transparansi/           # Transparansi anggaran
+│       │   ├── Apbdes.tsx          # Grafik interaktif pendapatan dan belanja desa
+│       │   └── Galeri.tsx          # Dokumentasi infografis transparansi desa
+│       │
+│       ├── potensi/                # Potensi wilayah desa (Modul Potensi Lengkap)
+│       │   ├── Pariwisata.tsx      # Akomodasi/penginapan wisata, rating, review & WA
+│       │   ├── Pendidikan.tsx      # Daftar sekolah, jumlah siswa/guru, akreditasi
+│       │   ├── Kesehatan.tsx       # Fasilitas kesehatan, jam buka & jenis layanan
+│       │   ├── Ekonomi.tsx         # Pasar, koperasi, bank, dan produk dagang
+│       │   ├── Komoditas.tsx       # Produk tani, ternak, perikanan, luas lahan
+│       │   └── Umkm.tsx            # Etalase produk lokal pelaku UMKM desa
+│       │
+│       └── admin/                  # Halaman panel kontrol admin (CRUD & Config)
+│           ├── Dashboard.tsx       # Statistik ringkasan data website
+│           ├── Profil.tsx          # Update data dasar & sejarah desa
+│           ├── Statistik.tsx       # Form input angka demografi & kependudukan
+│           ├── Berita.tsx          # Manajemen berita & pengumuman
+│           ├── Panduan.tsx         # Manajemen panduan pelayanan
+│           ├── Dokumen.tsx         # Upload berkas surat & dokumen unduhan
+│           ├── Lembaga.tsx         # CRUD data pengurus organisasi desa
+│           ├── Galeri.tsx          # Upload dokumentasi galeri & infografis
+│           ├── Komoditas.tsx       # Pengelolaan data komoditas pertanian
+│           ├── Umkm.tsx            # CRUD data lapak UMKM warga
+│           ├── Pariwisata.tsx      # CRUD daftar penginapan & akomodasi wisata
+│           ├── Pendidikan.tsx      # CRUD fasilitas pendidikan
+│           ├── Kesehatan.tsx       # CRUD data puskesmas, posyandu & apotek
+│           ├── Ekonomi.tsx         # CRUD sarana perekonomian pasar/koperasi
+│           ├── Apbdes.tsx          # Pengisian anggaran belanja/pendapatan APBDes
+│           ├── Pengaduan.tsx       # Inbox aduan warga & form tanggapan/balasan
+│           ├── Sotk.tsx            # Manajemen bagan hierarki & kepengurusan SOTK
+│           └── Pengaturan.tsx      # Konfigurasi visual (warna, logo, favicon, running text)
+│
+├── contracts/                      # Kontrak tipe data frontend-backend
+├── scripts/                        # Skrip migrasi lokal & backup database
+├── package.json                    # Daftar pustaka (dependencies) & skrip build
+└── tsconfig.json                   # Konfigurasi kompiler TypeScript
+
+================================================================================
+4. PENJELASAN SKEMA DATABASE (20+ TABEL PENTING)
+================================================================================
+Skema database didefinisikan dalam berkas `db/schema.ts` menggunakan tipe data MySQL. 
+Berikut rincian tabel utama beserta fungsinya:
+
+1. `users`
+   - Fungsi: Menyimpan kredensial akun administrator.
+   - Kolom Utama: `id`, `unionId` (untuk identitas unik auth), `name`, `email`, 
+     `role` (enum: user, admin), `lastSignInAt`.
+
+2. `profil_desa`
+   - Fungsi: Menyimpan data dinamis profil desa menggunakan format Key-Value.
+   - Kolom Utama: `id`, `kunci` (sebagai key unik, misal: 'nama_desa', 'visi'), 
+     `nilai` (nilai dari key tersebut).
+
+3. `statistik_desa`
+   - Fungsi: Menyimpan sejarah & data demografi kependudukan per tahun.
+   - Kolom Utama: `id`, `tahun`, `totalPenduduk`, `totalKK`, `totalLakiLaki`, 
+     `totalPerempuan`, `luasWilayah`, `jumlahDusun`, `jumlahRT`, `jumlahRW`,
+     `dataPendidikan` (JSON), `dataAngkatanKerja` (JSON), `dataUsia` (JSON).
+
+4. `berita`
+   - Fungsi: Menyimpan artikel warta, berita, dan pengumuman desa.
+   - Kolom Utama: `id`, `judul`, `slug` (URL-friendly text), `isi` (konten teks), 
+     `gambarSampul`, `kategori` (enum: kabar_desa, pengumuman, berita), 
+     `status` (enum: draft, published, archived), `tanggalPublish`.
+
+5. `panduan`
+   - Fungsi: Menyimpan panduan administratif pengurusan surat bagi warga.
+   - Kolom Utama: `id`, `judul`, `konten`, `filePdf` (URL file dokumen panduan), 
+     `kategori`, `urutan`.
+
+6. `dokumen`
+   - Fungsi: Menyimpan metadata file dokumen publik yang bisa diunduh gratis.
+   - Kolom Utama: `id`, `judul`, `fileUrl`, `deskripsi`, `kategori`, `urutan`.
+
+7. `lembaga`
+   - Fungsi: Menyimpan profil lembaga kemasyarakatan tingkat desa.
+   - Kolom Utama: `id`, `nama`, `jenis` (enum: pemerintahan, bpd, pkk, 
+     karang_taruna, lpmd, lainnya), `deskripsi`, `fotoUrl`, `ketua`, `anggota`.
+
+8. `galeri`
+   - Fungsi: Menyimpan koleksi dokumentasi foto kegiatan dan publikasi desa.
+   - Kolom Utama: `id`, `judul`, `gambarUrl`, `kategori` (enum: kegiatan, 
+     infrastruktur, pariwisata, umkm, pertanian, infografis, lainnya), `tanggal`.
+
+9. `komoditas`
+   - Fungsi: Mencatat statistik komoditas pertanian, peternakan, dan perikanan.
+   - Kolom Utama: `id`, `nama`, `jenis` (enum: pertanian, peternakan, perikanan, 
+     perkebunan), `deskripsi`, `luasLahan`, `hasilProduksi`, `satuan`, `fotoUrl`.
+
+10. `umkm`
+    - Fungsi: Menampung daftar usaha mikro/lapak dagang milik warga setempat.
+    - Kolom Utama: `id`, `namaProduk`, `namaUsaha`, `deskripsi`, `fotoUrl`, 
+      `link` (sosial media/e-commerce), `kategori` (makanan, jasa, kerajinan, dll),
+      `pemilik`, `kontak`.
+
+11. `pengaduan`
+    - Fungsi: Menampung pesan saran/pengaduan langsung dari masyarakat.
+    - Kolom Utama: `id`, `nama` (pengadu), `kontak` (nomor WA/telp), `email`, 
+      `pesan`, `status` (enum: baru, diproses, selesai, ditolak), `respon` (tanggapan admin).
+
+12. `apbdes`
+    - Fungsi: Transparansi data Anggaran Pendapatan dan Belanja Desa.
+    - Kolom Utama: `id`, `tahun`, `pendapatanTotal`, `belanjaTotal`, `pembiayaanTotal`, 
+      `rincianPendapatan` (JSON), `rincianBelanja` (JSON), `dokumenUrl`, `gambarInfografis`.
+
+13. `tema_website`
+    - Fungsi: Kustomisasi identitas visual web (warna, logo, font).
+    - Kolom Utama: `id`, `statusDesa` (desa/kelurahan), `tema` (light/dark/custom), 
+      `warnaPrimer`, `warnaSkunder`, `warnaAccent`, `backgroundImage1` s/d `3`, 
+      `logoUrl`, `faviconUrl`, `runningTextAktif`, `fontFamily`, `borderRadius`.
+
+14. `dusun`
+    - Fungsi: Pencatatan nama wilayah dusun/lingkungan beserta kepala wilayahnya.
+    - Kolom Utama: `id`, `nama`, `deskripsi`, `kepala` (nama kepala dusun), `kontak`.
+
+15. `jabatan_desa`
+    - Fungsi: Menyimpan daftar aparat desa secara flat.
+    - Kolom Utama: `id`, `nama` (nama jabatan), `pejabat` (nama personil), `fotoUrl`.
+
+16. `running_text`
+    - Fungsi: Daftar teks pengumuman berjalan (marquee) di header/footer website.
+    - Kolom Utama: `id`, `teks`, `warna`, `backgroundColor`, `kecepatan`, `aktif`, `urutan`.
+
+17. `jabatan_sotk`
+    - Fungsi: Tabel relasi berhierarki untuk memetakan organisasi pemdes (org chart).
+    - Kolom Utama: `id`, `namaJabatan`, `pejabatNama`, `fotoUrl`, `parentId` (merujuk ke 
+      id jabatan atasan secara rekursif), `urutan`.
+
+18. `dusun_sotk`
+    - Fungsi: Menyimpan daftar kepala dusun khusus integrasi bagan organisasi.
+    - Kolom Utama: `id`, `namaDusun`, `kepala`, `fotoKepala`, `deskripsi`, `urutan`.
+
+19. `pariwisata`
+    - Fungsi: Daftar fasilitas pariwisata terpadu (seperti penginapan/homestay).
+    - Kolom Utama: `id`, `namaPenginapan`, `alamat`, `latitude`, `longitude`, 
+      `fotoPenginapan` (JSON array), `kontakWhatsapp`, `hargaMin`, `hargaMax`, 
+      `fasilitas` (JSON), `rating`.
+
+20. `pariwisata_reviews`
+    - Fungsi: Ulasan dan penilaian (rating) pengunjung terhadap objek penginapan.
+    - Kolom Utama: `id`, `pariwisataId`, `userId`, `unionId`, `rating`, `review`.
+
+21. `pendidikan`
+    - Fungsi: Sarana dan fasilitas pendidikan di desa.
+    - Kolom Utama: `id`, `namaSarana`, `jenjang` (enum: paud s/d s3), `alamat`, 
+      `latitude`, `longitude`, `kepala`, `jumlahGuru`, `jumlahSiswa`, `statusAkreditasi`.
+
+22. `kesehatan`
+    - Fungsi: Sarana kesehatan umum seperti puskesmas, klinik, atau posyandu.
+    - Kolom Utama: `id`, `namaSarana`, `jenis` (enum), `alamat`, `latitude`, `longitude`, 
+      `jamBuka`, `jamTutup`, `layanan` (JSON).
+
+23. `ekonomi`
+    - Fungsi: Infrastruktur ekonomi lokal (pasar desa, koperasi, ATM/bank).
+    - Kolom Utama: `id`, `namaSarana`, `jenis` (enum), `alamat`, `latitude`, `longitude`, 
+      `produk` (JSON).
+
+================================================================================
+5. ALUR KERJA (WORKFLOW) SISTEM
+================================================================================
+
+--------------------------------------------------------------------------------
+A. PROSES BOOTSTRAPPING & MODE MENJALANKAN APLIKASI
+--------------------------------------------------------------------------------
+Sistem dimulai dari penyiapan variabel lingkungan (environment variables) di `.env`:
+1. Server membaca berkas `.env` untuk memperoleh koneksi `DATABASE_URL`, kunci enkripsi 
+   `SESSION_SECRET`, dan kredensial akses `ADMIN_USERNAME` / `ADMIN_PASSWORD`.
+2. Saat aplikasi dijalankan dalam mode pengembangan (`npm run dev`):
+   - Vite memuat file index.html di browser.
+   - Vite Dev Server memproses file TypeScript secara cepat melalui bundler internal.
+   - Kueri API dikendalikan secara transparan oleh middleware server Hono.
+3. Saat dijalankan dalam mode produksi (`npm run build` dan `npm run start`):
+   - Modul API dikompilasi menjadi satu file JavaScript JavaScript (`dist/boot.js`).
+   - Sektor Frontend dikompilasi menjadi static assets dalam folder `dist/public`.
+   - Node.js menjalankan server terpadu, membuka port 3000, melayani request data, 
+     dan menyajikan berkas frontend dari folder publik tersebut.
+
+--------------------------------------------------------------------------------
+B. ALUR KOMUNIKASI DATA TYPESAFE (tRPC)
+--------------------------------------------------------------------------------
+Aplikasi ini tidak menggunakan endpoint API berbasis REST tradisional, melainkan tRPC:
+1. Skema router dideklarasikan di backend (`api/desa-router.ts`). Contoh:
+   - `berita.list` (membaca daftar berita)
+   - `pengaduan.create` (membuat pengaduan baru)
+2. Frontend mengimpor definisi tipe (Type Definition) router tersebut tanpa 
+   mengimpor kode implementasinya.
+3. Komponen React memanggil fungsi API menggunakan method hooks:
+   `const { data } = trpc.desa.berita.list.useQuery();`
+4. tRPC Client otomatis memformulasikan request HTTP POST/GET yang diarahkan ke 
+   endpoint `/api/trpc/desa.berita.list`.
+5. Hono menerimanya, memecah payload lewat adapter, memproses logika kueri database 
+   (melalui Drizzle ORM), mem-format dengan serializer `superjson` (menjaga integritas 
+   tipe data seperti Date/Decimal), lalu mengirimkannya kembali ke browser.
+6. Dengan sistem ini, kesalahan ketik nama kolom atau ketidakcocokan tipe data 
+   dapat terdeteksi langsung sejak proses kompilasi kode (mencegah bug runtime).
+
+--------------------------------------------------------------------------------
+C. MEKANISME AUTENTIKASI & KEAMANAN ADMIN
+--------------------------------------------------------------------------------
+Keamanan rute internal dashboard dikelola secara ketat:
+1. Operator mengakses rute `/login`.
+2. Data login dikirim via HTTP POST menuju `/api/login`.
+3. Server mencocokkan input terhadap username dan password admin yang dikonfigurasi.
+4. Jika cocok, server menggunakan library `jose` untuk menerbitkan sebuah token JWT 
+   (JSON Web Token) yang dienkripsi dengan kunci rahasia `SESSION_SECRET`.
+5. Token disimpan di dalam browser sebagai HTTP-Only Cookie (atau di authorization header), 
+   menghalangi pencurian token melalui skrip XSS jahat.
+6. Saat frontend melakukan operasi administrasi (mutasi CRUD):
+   - tRPC Context parser membaca cookie token JWT tersebut.
+   - Middleware `adminQuery` memverifikasi masa berlaku dan kecocokan tanda tangan JWT.
+   - Jika verifikasi gagal, server langsung melempar respons error 401 Unauthorized, 
+     dan frontend otomatis memindahkan user kembali ke halaman login.
+
+--------------------------------------------------------------------------------
+D. ALUR DINAMIS TEMA & KUSTOMISASI TAMPILAN
+--------------------------------------------------------------------------------
+Visualisasi website dapat disesuaikan tanpa menyentuh kode pemrograman:
+1. Pengaturan tema visual disimpan secara tersentralisasi pada tabel `tema_website`.
+2. Setiap kali ada halaman diakses, hook React `useSiteMetadata` dipicu pada level root (`App.tsx`).
+3. Hook mengambil profil desa terbaru dan konfigurasi tema aktif dari database.
+4. Nilai-nilai konfigurasi langsung diinjeksikan ke browser secara real-time:
+   - Nilai nama desa dimasukkan sebagai pemicu pengubah judul tab halaman (`document.title`).
+   - File ikon favicon diperbarui sesuai dengan `faviconUrl` hasil konfigurasi admin.
+   - Komponen Navbar dan elemen dekoratif lainnya menyerap variabel warna primer/sekunder 
+     secara dinamis dari respons server untuk mengubah latar belakang dan teks secara instan.
+
+--------------------------------------------------------------------------------
+E. ALUR PENGADUAN MASYARAKAT & TINDAK LANJUT ADMIN
+--------------------------------------------------------------------------------
+Merupakan kanal komunikasi dua arah antara warga dan perangkat desa:
+1. Warga membuka halaman `/kontak` dan mengisi formulir pengaduan (Nama, Kontak, Pesan).
+2. Data dikirim ke backend melalui mutasi tRPC `trpc.desa.pengaduan.create`.
+3. Rekaman baru masuk ke tabel `pengaduan` dengan status default `"baru"`.
+4. Administrator menerima notifikasi/melihat daftar aduan di halaman `/admin/pengaduan`.
+5. Admin dapat merespons pengaduan tersebut:
+   - Menulis tanggapan atau solusi penyelesaian pada kolom respons.
+   - Mengubah status aduan menjadi `"diproses"` atau `"selesai"`.
+6. Data respons ter-update di database sehingga transparansi proses penanganan aduan 
+   dapat dipantau langsung.
+
+--------------------------------------------------------------------------------
+F. ALUR VISUALISASI BAGAN ORGANISASI (SOTK)
+--------------------------------------------------------------------------------
+Sistem mampu menyajikan bagan struktur organisasi perangkat desa secara interaktif:
+1. Admin mendaftarkan daftar jabatan beserta personilnya di menu `/admin/sotk`.
+2. Pada tiap jabatan (kecuali Kepala Desa/pucuk pimpinan), admin wajib memilih 
+   "Atasan Langsung" yang mereferensikan baris data jabatan lain (`parentId`).
+3. Pada halaman publik `/pemerintahan/sotk`:
+   - Frontend mengunduh seluruh data aparat yang berupa deretan data flat (datar).
+   - Algoritma dalam file `treeBuilder.ts` menyusun baris data flat tersebut secara 
+     rekursif menjadi struktur bertingkat (Parent-Children Tree).
+   - Komponen `SotkUnifiedChart` menggambar bagan kotak-kotak struktur pimpinan.
+   - Elemen `SVGConnectors` membaca posisi koordinat relatif dari masing-masing kotak 
+     kemudian menggambar garis melengkung dinamis berbasis SVG untuk menghubungkan 
+     kartu jabatan atasan ke bawahannya secara dinamis.
+   - Disediakan kontrol navigasi interaktif bagi warga untuk memperbesar (zoom in), 
+     memperkecil (zoom out), dan menyeret (pan) bagan organisasi tersebut.
+
+--------------------------------------------------------------------------------
+G. ALUR PUSAT DATA & INFOGRAFIS DEMOGRAFI PENDUDUK
+--------------------------------------------------------------------------------
+Mendukung program transparansi data statistik desa:
+1. Operator desa mengunggah data sensus kependudukan tahunan lewat `/admin/statistik`.
+2. Input dipecah ke dalam struktur JSON detail untuk menghemat ruang kolom, mencakup:
+   - Tingkat Pendidikan (Tidak Sekolah, SD, SMP, SMA, Diploma, Sarjana).
+   - Angkatan Kerja (Bekerja, Pengangguran, Tidak Bekerja).
+   - Distribusi Rentang Usia per 5 tahun.
+3. Hono menyimpan objek terstruktur tersebut ke dalam kolom berformat JSON di tabel `statistik_desa`.
+4. Saat warga mengakses `/profil/demografi`:
+   - Data tahun terbaru diunduh dan diparsing otomatis oleh React.
+   - Angka rentang usia dipetakan menjadi visualisasi visual "Piramida Penduduk" menggunakan 
+     grafik batang ganda Recharts.
+   - Data pendidikan dan angkatan kerja dirender menjadi grafik lingkaran (Pie Chart) 
+     berwarna-warni lengkap dengan legenda dan tooltip interaktif.
+
+================================================================================
+6. PANDUAN PENGOPERASIAN & TROUBLESHOOTING SINGKAT
+================================================================================
+Bagaimana Cara Menjalankan Project ini di Lingkungan Lokal Baru?
+1. Persiapkan MySQL Server di komputer lokal Anda, buat database baru bernama `desa_cantik`.
+2. Duplikat file `.env.example` menjadi file `.env`, lalu sesuaikan kredensial koneksi 
+   database pada variabel `DATABASE_URL`.
+3. Jalankan perintah instalasi dependensi:
+   `npm install`
+4. Jalankan inisialisasi skema tabel dan pembuatan data contoh (seeding) ke database:
+   `node ./scripts/run-migration.js`
+   `npm run db:migrate`
+   `npx tsx db/seed.ts`
+5. Jalankan server lokal:
+   `npm run dev`
+6. Buka browser pada alamat `http://localhost:3000`.
+
+Langkah Penanganan Mandiri jika Website Menampilkan Layar Putih (White Screen):
+- Cek koneksi server database: Pastikan database MySQL aktif dan dapat diakses menggunakan 
+  kredensial yang tercantum di file `.env`.
+- Periksa konsol browser (Tekan tombol F12 -> tab Console): Cari pesan kesalahan berwarna 
+  merah. Seringkali disebabkan karena file `.env` tidak ditemukan atau tabel database 
+  belum terbentuk (migration belum dijalankan).
+- Bersihkan cache browser dan jalankan ulang perintah `npm run dev` pada terminal.
+================================================================================

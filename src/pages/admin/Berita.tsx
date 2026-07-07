@@ -66,7 +66,11 @@ export default function AdminBerita() {
       resetForm();
       toast.success("Berita berhasil ditambahkan!");
     },
-    onError: () => toast.error("Gagal menambahkan berita"),
+    onError: (error: any) => {
+      console.error("Create error:", error);
+      const msg = error?.message || "Gagal menambahkan berita";
+      toast.error(msg);
+    },
   });
 
   const update = trpc.desa.berita.update.useMutation({
@@ -76,7 +80,11 @@ export default function AdminBerita() {
       resetForm();
       toast.success("Berita berhasil diperbarui!");
     },
-    onError: () => toast.error("Gagal memperbarui berita"),
+    onError: (error: any) => {
+      console.error("Update error:", error);
+      const msg = error?.message || "Gagal memperbarui berita";
+      toast.error(msg);
+    },
   });
 
   const deleteMutation = trpc.desa.berita.delete.useMutation({
@@ -84,7 +92,11 @@ export default function AdminBerita() {
       utils.desa.berita.list.invalidate();
       toast.success("Berita berhasil dihapus!");
     },
-    onError: () => toast.error("Gagal menghapus berita"),
+    onError: (error: any) => {
+      console.error("Delete error:", error);
+      const msg = error?.message || "Gagal menghapus berita";
+      toast.error(msg);
+    },
   });
 
   const resetForm = () => {
@@ -114,6 +126,23 @@ export default function AdminBerita() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validasi
+    if (!form.judul.trim()) {
+      toast.error("Judul tidak boleh kosong");
+      return;
+    }
+
+    if (!form.slug.trim()) {
+      toast.error("Slug tidak boleh kosong");
+      return;
+    }
+
+    if (!form.isi.trim()) {
+      toast.error("Isi berita tidak boleh kosong");
+      return;
+    }
+
     if (editingId) {
       update.mutate({ id: editingId, ...form });
     } else {

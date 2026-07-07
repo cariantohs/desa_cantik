@@ -35,23 +35,42 @@ export default function MandiriPage() {
               Akses layanan pengurusan dokumen, pengajuan permohonan, dan
               layanan publik lainnya secara mandiri melalui platform online.
             </p>
-            <Button
-              size="lg"
-              className="bg-emerald-700 hover:bg-emerald-800 text-white font-medium"
-              asChild
-            >
-              <a
-                href={layananUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2"
+            <div className="space-y-4">
+              <Button
+                size="lg"
+                className="bg-emerald-700 hover:bg-emerald-800 text-white font-medium"
+                asChild
               >
-                Buka Layanan Mandiri
-                <ExternalLink className="w-4 h-4" />
-              </a>
-            </Button>
+                <a
+                  href={layananUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2"
+                >
+                  Buka Layanan Mandiri
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              </Button>
+
+              <Button
+                size="lg"
+                variant="outline"
+                className="text-emerald-700 border-emerald-200 hover:border-emerald-300 hover:bg-emerald-50"
+                asChild
+              >
+                <a
+                  href="https://cekbansos.kemensos.go.id/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2"
+                >
+                  Cek Penerima Manfaat Bansos
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              </Button>
+            </div>
             <p className="text-xs text-gray-400 mt-4">
-              Anda akan diarahkan ke halaman eksternal
+              Link resmi Kementerian Sosial untuk pengecekan status bansos
             </p>
           </CardContent>
         </Card>

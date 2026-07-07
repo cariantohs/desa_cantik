@@ -1,12 +1,15 @@
 import { Routes, Route } from "react-router";
 import { Toaster } from "@/components/ui/sonner";
+import { useSiteMetadata } from "@/hooks/useSiteMetadata";
 
 // Public Pages
 import Home from "./pages/Home";
 import SejarahPage from "./pages/profil/Sejarah";
 import GeografisPage from "./pages/profil/Geografis";
 import DemografiPage from "./pages/profil/Demografi";
+import DusunPage from "./pages/profil/Dusun";
 import StrukturPage from "./pages/pemerintahan/Struktur";
+import SotkPage from "./pages/pemerintahan/Sotk";
 import BPDPage from "./pages/pemerintahan/BPD";
 import LembagaPage from "./pages/pemerintahan/Lembaga";
 import PanduanPage from "./pages/layanan/Panduan";
@@ -16,6 +19,10 @@ import ApbdesPage from "./pages/transparansi/Apbdes";
 import GaleriPage from "./pages/transparansi/Galeri";
 import KomoditasPage from "./pages/potensi/Komoditas";
 import UmkmPage from "./pages/potensi/Umkm";
+import PariwisataPage from "./pages/potensi/Pariwisata";
+import PendidikanPage from "./pages/potensi/Pendidikan";
+import KesehatanPage from "./pages/potensi/Kesehatan";
+import EkonomiPage from "./pages/potensi/Ekonomi";
 import BeritaPage from "./pages/Berita";
 import BeritaDetailPage from "./pages/BeritaDetail";
 import KontakPage from "./pages/Kontak";
@@ -33,12 +40,24 @@ import AdminKomoditas from "./pages/admin/Komoditas";
 import AdminUmkm from "./pages/admin/Umkm";
 import AdminApbdes from "./pages/admin/Apbdes";
 import AdminPengaduan from "./pages/admin/Pengaduan";
+import AdminPengaturan from "./pages/admin/Pengaturan";
+import AdminSotk from "./pages/admin/Sotk";
+
+// Auth Pages
+import AdminPariwisata from "./pages/admin/Pariwisata";
+import AdminPendidikan from "./pages/admin/Pendidikan";
+import AdminKesehatan from "./pages/admin/Kesehatan";
+import AdminEkonomi from "./pages/admin/Ekonomi";
 
 // Auth Pages
 import Login from "./pages/Login";
+import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
 export default function App() {
+  // Set dynamic page title and favicon based on desa settings
+  useSiteMetadata();
+
   return (
     <>
       <Routes>
@@ -49,9 +68,11 @@ export default function App() {
         <Route path="/profil/sejarah" element={<SejarahPage />} />
         <Route path="/profil/geografis" element={<GeografisPage />} />
         <Route path="/profil/demografi" element={<DemografiPage />} />
+        <Route path="/profil/dusun" element={<DusunPage />} />
         
         {/* Pemerintahan */}
         <Route path="/pemerintahan/struktur" element={<StrukturPage />} />
+        <Route path="/pemerintahan/sotk" element={<SotkPage />} />
         <Route path="/pemerintahan/bpd" element={<BPDPage />} />
         <Route path="/pemerintahan/lembaga" element={<LembagaPage />} />
         
@@ -67,6 +88,10 @@ export default function App() {
         {/* Potensi Desa */}
         <Route path="/potensi/komoditas" element={<KomoditasPage />} />
         <Route path="/potensi/umkm" element={<UmkmPage />} />
+          <Route path="/potensi/pariwisata" element={<PariwisataPage />} />
+          <Route path="/potensi/pendidikan" element={<PendidikanPage />} />
+          <Route path="/potensi/kesehatan" element={<KesehatanPage />} />
+          <Route path="/potensi/ekonomi" element={<EkonomiPage />} />
         
         {/* Berita */}
         <Route path="/berita" element={<BeritaPage />} />
@@ -77,6 +102,7 @@ export default function App() {
         
         {/* Auth */}
         <Route path="/login" element={<Login />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminDashboard />} />
@@ -89,8 +115,14 @@ export default function App() {
         <Route path="/admin/galeri" element={<AdminGaleri />} />
         <Route path="/admin/komoditas" element={<AdminKomoditas />} />
         <Route path="/admin/umkm" element={<AdminUmkm />} />
+        <Route path="/admin/pariwisata" element={<AdminPariwisata />} />
+        <Route path="/admin/pendidikan" element={<AdminPendidikan />} />
+        <Route path="/admin/kesehatan" element={<AdminKesehatan />} />
+        <Route path="/admin/ekonomi" element={<AdminEkonomi />} />
         <Route path="/admin/apbdes" element={<AdminApbdes />} />
         <Route path="/admin/pengaduan" element={<AdminPengaduan />} />
+        <Route path="/admin/pengaturan" element={<AdminPengaturan />} />
+        <Route path="/admin/sotk" element={<AdminSotk />} />
         
         {/* 404 */}
         <Route path="*" element={<NotFound />} />

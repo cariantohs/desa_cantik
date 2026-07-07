@@ -1,0 +1,8 @@
+- [ ] Update `src/pages/potensi/Pariwisata.tsx` to Agoda-like layout:
+  - [ ] List cards: left photo carousel + right info
+  - [ ] Show Google Maps link, avg rating + total reviews, facilities chips
+  - [ ] Click to show detail panel
+- [ ] Update `src/pages/admin/Pariwisata.tsx` to modernize UI and show rating avg
+  - [ ] Ensure table/card remains functional
+  - [ ] Use reviews list count when available
+- [ ] Sanity check TypeScript/JSX compile (no tag mismatch)

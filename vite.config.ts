@@ -12,6 +12,11 @@ export default defineConfig({
     inspectAttr(), react()],
   server: {
     port: 3000,
+    allowedHosts: [".localto.net", "localhost"],
+    // HMR via LocalTo sering gagal (WebSocket mismatch), sehingga
+    // membebani client/server dan memperparah error 429.
+    // Matikan HMR untuk menghindari retry websocket.
+    hmr: false,
   },
   resolve: {
     alias: {

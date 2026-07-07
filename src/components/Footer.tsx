@@ -160,20 +160,23 @@ export default function Footer() {
 
       {/* Attribution Bar */}
       <div className="bg-emerald-950 border-t border-emerald-800">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex flex-col md:flex-row items-center justify-center gap-3">
+        <div className="max-w-7xl mx-auto px-4 py-3">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-center gap-2 md:gap-3">
             {footerLogoUrl ? (
               <img
                 src={footerLogoUrl}
                 alt="Logo BPS"
-                className="h-10 object-contain"
+                className="h-9 object-contain mx-auto md:mx-0"
               />
             ) : (
-              <div className="h-10 w-10 bg-emerald-800 rounded flex items-center justify-center">
-                <span className="text-xs font-bold text-emerald-300">BPS</span>
+              <div className="h-9 w-9 bg-emerald-800 rounded flex items-center justify-center shrink-0 mx-auto md:mx-0">
+                <span className="text-[10px] font-bold text-emerald-300">BPS</span>
               </div>
             )}
-            <p className="text-xs text-emerald-300 text-center">{footerTeks}</p>
+
+            <p className="text-[11px] text-emerald-300 text-center">
+              {footerTeks}
+            </p>
           </div>
         </div>
       </div>

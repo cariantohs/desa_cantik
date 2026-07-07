@@ -328,3 +328,327 @@ export const apbdes = mysqlTable("apbdes", {
 
 export type Apbdes = typeof apbdes.$inferSelect;
 export type InsertApbdes = typeof apbdes.$inferInsert;
+
+// ============================================================
+// 12. tema_website - Website theme & appearance configuration
+// ============================================================
+export const temaWebsite = mysqlTable("tema_website", {
+  id: serial("id").primaryKey(),
+  // Status desa/kelurahan
+  statusDesa: mysqlEnum("status_desa", ["desa", "kelurahan"])
+    .default("desa")
+    .notNull(),
+  // Tema visual
+  tema: mysqlEnum("tema", ["light", "dark", "custom"])
+    .default("light")
+    .notNull(),
+  warnaPrimer: varchar("warna_primer", { length: 7 }).default("#065f46"), // Emerald-700
+  warnaSkunder: varchar("warna_skunder", { length: 7 }).default("#f3f4f6"), // Gray-100
+  warnaAccent: varchar("warna_accent", { length: 7 }).default("#dc2626"), // Red-600
+  // Background images
+  backgroundImage1: text("background_image_1"),
+  backgroundImage2: text("background_image_2"),
+  backgroundImage3: text("background_image_3"),
+  backgroundAnimationSpeed: int("background_animation_speed").default(5), // Detik
+  // Logo
+  logoUrl: text("logo_url"),
+  logoKecilUrl: text("logo_kecil_url"),
+  // Favicon
+  faviconUrl: text("favicon_url"),
+  // Running text
+  runningTextAktif: int("running_text_aktif").default(1), // 1 untuk aktif, 0 untuk tidak
+  // Font
+  fontFamily: varchar("font_family", { length: 100 }).default("system-ui"),
+  // Border radius bentuk
+  borderRadius: mysqlEnum("border_radius", ["none", "sm", "md", "lg", "full"])
+    .default("md")
+    .notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt")
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+export type TemaWebsite = typeof temaWebsite.$inferSelect;
+export type InsertTemaWebsite = typeof temaWebsite.$inferInsert;
+
+// ============================================================
+// 13. dusun - Sub-villages (Dusun/Lingkungan)
+// ============================================================
+export const dusun = mysqlTable("dusun", {
+  id: serial("id").primaryKey(),
+  nama: varchar("nama", { length: 255 }).notNull(),
+  deskripsi: text("deskripsi"),
+  kepala: varchar("kepala", { length: 255 }),
+  kontak: varchar("kontak", { length: 50 }),
+  urutan: int("urutan").default(0),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt")
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+export type Dusun = typeof dusun.$inferSelect;
+export type InsertDusun = typeof dusun.$inferInsert;
+
+// ============================================================
+// 14. jabatan_desa - Village official positions
+// ============================================================
+export const jabatanDesa = mysqlTable("jabatan_desa", {
+  id: serial("id").primaryKey(),
+  nama: varchar("nama", { length: 255 }).notNull(), // e.g., "Kepala Desa", "Sekretaris Desa"
+  pejabat: varchar("pejabat", { length: 255 }).notNull(), // Nama pejabat
+  fotoUrl: text("foto_url"),
+  deskripsi: text("deskripsi"),
+  urutan: int("urutan").default(0),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt")
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+export type JabatanDesa = typeof jabatanDesa.$inferSelect;
+export type InsertJabatanDesa = typeof jabatanDesa.$inferInsert;
+
+// ============================================================
+// 15. running_text - Scrolling text banner
+// ============================================================
+export const runningText = mysqlTable("running_text", {
+  id: serial("id").primaryKey(),
+  teks: text("teks").notNull(),
+  warna: varchar("warna", { length: 7 }).default("#ffffff"),
+  backgroundColor: varchar("background_color", { length: 7 }).default("#dc2626"),
+  kecepatan: int("kecepatan").default(50), // pixels per second
+  aktif: int("aktif").default(1), // 1 = aktif, 0 = nonaktif
+  urutan: int("urutan").default(0),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt")
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+export type RunningText = typeof runningText.$inferSelect;
+export type InsertRunningText = typeof runningText.$inferInsert;
+
+// ============================================================
+// SOTK (Struktur Organisasi dan Tata Kerja) Tables
+// ============================================================
+
+// Jabatan dengan parent-child hierarchy untuk membentuk org chart
+export const jabatanSotk = mysqlTable("jabatan_sotk", {
+  id: serial("id").primaryKey(),
+  namaJabatan: varchar("nama_jabatan", { length: 255 }).notNull(),
+  pejabatNama: varchar("pejabat_nama", { length: 255 }).notNull(),
+  fotoUrl: text("foto_url"), // URL foto pejabat
+  deskripsi: text("deskripsi"), // Keterangan/tugas jabatan
+  parentId: int("parent_id"), // Self-reference untuk hierarki (null untuk kepala desa)
+  urutan: int("urutan").default(0), // Sort order dalam level yang sama
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt")
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+export type JabatanSotk = typeof jabatanSotk.$inferSelect;
+export type InsertJabatanSotk = typeof jabatanSotk.$inferInsert;
+
+// Dusun/Lingkungan dengan kepala dusun
+export const dusunSotk = mysqlTable("dusun_sotk", {
+  id: serial("id").primaryKey(),
+  namaDusun: varchar("nama_dusun", { length: 255 }).notNull(),
+  kepala: varchar("kepala", { length: 255 }).notNull(),
+  fotoKepala: text("foto_kepala"), // URL foto kepala dusun
+  deskripsi: text("deskripsi"), // Deskripsi dusun
+  urutan: int("urutan").default(0), // Sort order
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt")
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+export type DusunSotk = typeof dusunSotk.$inferSelect;
+export type InsertDusunSotk = typeof dusunSotk.$inferInsert;
+
+// ============================================================
+// 16. pariwisata - Tourism accommodations (penginapan)
+// ============================================================
+export const pariwisata = mysqlTable("pariwisata", {
+  id: serial("id").primaryKey(),
+  namaPenginapan: varchar("nama_penginapan", { length: 255 }).notNull(),
+  alamat: text("alamat").notNull(),
+  latitude: decimal("latitude", { precision: 10, scale: 8 }),
+  longitude: decimal("longitude", { precision: 11, scale: 8 }),
+  deskripsi: text("deskripsi"),
+  // Multiple photos stored as JSON array of URLs
+  fotoPenginapan: json("foto_penginapan").$type<string[]>().default([]),
+  kontakWhatsapp: varchar("kontak_whatsapp", { length: 20 }),
+  hargaMin: decimal("harga_min", { precision: 12, scale: 2 }),
+  hargaMax: decimal("harga_max", { precision: 12, scale: 2 }),
+  satuanHarga: varchar("satuan_harga", { length: 50 }).default("per malam"),
+  fasilitas: json("fasilitas").$type<string[]>().default([]),
+  rating: decimal("rating", { precision: 3, scale: 2 }),
+  urutan: int("urutan").default(0),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt")
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+// ============================================================
+// Pariwisata Reviews (rating & ulasan user)
+// ============================================================
+export const pariwisataReviews = mysqlTable("pariwisata_reviews", {
+  id: serial("id").primaryKey(),
+  pariwisataId: int("pariwisata_id").notNull(),
+  userId: int("user_id"),
+  unionId: varchar("union_id", { length: 255 }).notNull(),
+
+  rating: decimal("rating", { precision: 3, scale: 2 }).notNull(),
+  review: text("review").notNull(),
+
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt")
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+export type PariwisataReviews = typeof pariwisataReviews.$inferSelect;
+export type InsertPariwisataReviews = typeof pariwisataReviews.$inferInsert;
+
+export type Pariwisata = typeof pariwisata.$inferSelect;
+export type InsertPariwisata = typeof pariwisata.$inferInsert;
+
+// ============================================================
+// 17. pendidikan - Educational facilities (schools, colleges, etc)
+// ============================================================
+export const pendidikan = mysqlTable("pendidikan", {
+  id: serial("id").primaryKey(),
+  namaSarana: varchar("nama_sarana", { length: 255 }).notNull(),
+  jenjang: mysqlEnum("jenjang", [
+    "paud",
+    "tk",
+    "sd",
+    "smp",
+    "sma",
+    "smk",
+    "d1",
+    "d2",
+    "d3",
+    "d4",
+    "s1",
+    "s2",
+    "s3",
+  ])
+    .notNull(),
+  alamat: text("alamat").notNull(),
+  latitude: decimal("latitude", { precision: 10, scale: 8 }),
+  longitude: decimal("longitude", { precision: 11, scale: 8 }),
+  kepala: varchar("kepala", { length: 255 }),
+  kontakNomor: varchar("kontak_nomor", { length: 20 }),
+  kontakEmail: varchar("kontak_email", { length: 255 }),
+  deskripsi: text("deskripsi"),
+  fotoUrl: text("foto_url"),
+  jumlahGuru: int("jumlah_guru"),
+  jumlahSiswa: int("jumlah_siswa"),
+  tahunBerdiri: int("tahun_berdiri"),
+  statusAkreditasi: varchar("status_akreditasi", { length: 10 }),
+  urutan: int("urutan").default(0),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt")
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+export type Pendidikan = typeof pendidikan.$inferSelect;
+export type InsertPendidikan = typeof pendidikan.$inferInsert;
+
+// ============================================================
+// 18. kesehatan - Health facilities (hospitals, clinics, etc)
+// ============================================================
+export const kesehatan = mysqlTable("kesehatan", {
+  id: serial("id").primaryKey(),
+  namaSarana: varchar("nama_sarana", { length: 255 }).notNull(),
+  jenis: mysqlEnum("jenis", [
+    "puskesmas",
+    "poliklinik",
+    "rumah_sakit",
+    "apotek",
+    "klinik",
+    "posyandu",
+    "praktik_dokter",
+    "praktik_bidan",
+  ])
+    .notNull(),
+  alamat: text("alamat").notNull(),
+  latitude: decimal("latitude", { precision: 10, scale: 8 }),
+  longitude: decimal("longitude", { precision: 11, scale: 8 }),
+  pimpinan: varchar("pimpinan", { length: 255 }),
+  kontakNomor: varchar("kontak_nomor", { length: 20 }),
+  kontakEmail: varchar("kontak_email", { length: 255 }),
+  deskripsi: text("deskripsi"),
+  fotoUrl: text("foto_url"),
+  jamBuka: varchar("jam_buka", { length: 50 }),
+  jamTutup: varchar("jam_tutup", { length: 50 }),
+  layanan: json("layanan").$type<string[]>().default([]),
+  urutan: int("urutan").default(0),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt")
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+export type Kesehatan = typeof kesehatan.$inferSelect;
+export type InsertKesehatan = typeof kesehatan.$inferInsert;
+
+// ============================================================
+// 19. ekonomi - Economic facilities (markets, cooperatives, banks, etc)
+// ============================================================
+export const ekonomi = mysqlTable("ekonomi", {
+  id: serial("id").primaryKey(),
+  namaSarana: varchar("nama_sarana", { length: 255 }).notNull(),
+  jenis: mysqlEnum("jenis", [
+    "pasar",
+    "toko",
+    "koperasi",
+    "bank",
+    "bpr",
+    "lkm",
+    "bmt",
+    "unit_desa",
+    "industri_kecil",
+    "pertanian",
+    "perternakan",
+    "perikanan",
+  ])
+    .notNull(),
+  alamat: text("alamat").notNull(),
+  latitude: decimal("latitude", { precision: 10, scale: 8 }),
+  longitude: decimal("longitude", { precision: 11, scale: 8 }),
+  pimpinan: varchar("pimpinan", { length: 255 }),
+  kontakNomor: varchar("kontak_nomor", { length: 20 }),
+  kontakEmail: varchar("kontak_email", { length: 255 }),
+  deskripsi: text("deskripsi"),
+  fotoUrl: text("foto_url"),
+  jamBuka: varchar("jam_buka", { length: 50 }),
+  jamTutup: varchar("jam_tutup", { length: 50 }),
+  produk: json("produk").$type<string[]>().default([]),
+  urutan: int("urutan").default(0),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt")
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+export type Ekonomi = typeof ekonomi.$inferSelect;
+export type InsertEkonomi = typeof ekonomi.$inferInsert;

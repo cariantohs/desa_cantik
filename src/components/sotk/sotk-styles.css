@@ -1,0 +1,141 @@
+/* SOTK Organizational Chart Styles */
+
+/* Smooth transitions for all interactive elements */
+.sotk-node {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sotk-node:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+/* Connector line animations */
+.sotk-connector {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: drawLine 1s ease-out forwards;
+}
+
+@keyframes drawLine {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Card entrance animation */
+.sotk-card-enter {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: cardEnter 0.5s ease-out forwards;
+}
+
+@keyframes cardEnter {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Pulse animation for active status */
+.sotk-status-active {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Zoom transition */
+.sotk-zoom-container {
+  transition: transform 0.2s ease-out;
+}
+
+/* Mobile accordion animation */
+.sotk-mobile-children {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+.sotk-mobile-children.expanded {
+  max-height: 2000px;
+}
+
+/* Loading skeleton */
+.sotk-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Photo placeholder gradient */
+.sotk-photo-placeholder {
+  background: linear-gradient(135deg, #ccfbf1 0%, #5eead4 50%, #0d9488 100%);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .sotk-node:hover {
+    transform: none;
+    box-shadow: inherit;
+  }
+  
+  .sotk-connector {
+    animation: none;
+    stroke-dasharray: none;
+    stroke-dashoffset: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .sotk-zoom-controls {
+    display: none !important;
+  }
+  
+  .sotk-node {
+    break-inside: avoid;
+  }
+  
+  .sotk-connector {
+    stroke: #000 !important;
+    stroke-width: 1px !important;
+  }
+}
+
+/* Accessibility */
+.sotk-node:focus {
+  outline: 2px solid #0d9488;
+  outline-offset: 2px;
+}
+
+.sotk-node:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Dark mode support (optional) */
+@media (prefers-color-scheme: dark) {
+  .sotk-card {
+    background: #1e293b;
+    border-color: #334155;
+  }
+  
+  .sotk-connector {
+    stroke: #475569;
+  }
+}

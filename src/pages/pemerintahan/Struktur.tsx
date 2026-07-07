@@ -1,133 +1,77 @@
 import { trpc } from "@/providers/trpc";
 import Layout from "@/components/Layout";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Users, User } from "lucide-react";
+import { useDesaStatus } from "@/hooks/useDesaStatus";
+import { Building2 } from "lucide-react";
+import { SotkUnifiedChart } from "@/components/sotk";
 
 export default function StrukturPage() {
-  const { data: lembagaList } = trpc.desa.lembaga.list.useQuery({
-    jenis: "pemerintahan",
-  });
+  const { labels } = useDesaStatus();
+  
+  // Fetch SOTK Data
+  const { data: jabatanSotkList, isLoading: jabatanLoading } =
+    trpc.desa.jabatanSotk.list.useQuery();
+  const { data: dusunSotkList, isLoading: dusunLoading } = 
+    trpc.desa.dusunSotk.list.useQuery();
 
-  const pemerintahan = lembagaList?.[0];
+  if (jabatanLoading || dusunLoading) {
+    return (
+      <Layout>
+        <div className="min-h-screen flex items-center justify-center bg-slate-50">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-teal-700 mx-auto mb-4" />
+            <p className="text-slate-600 text-sm font-medium">Memuat struktur organisasi...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
-      <div className="bg-gradient-to-br from-emerald-700 to-teal-700 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4">
-          <h1 className="text-3xl font-bold">Struktur Organisasi</h1>
-          <p className="text-emerald-100 mt-2">
-            Struktur organisasi pemerintah desa
+      {/* Banner */}
+      <div className="bg-gradient-to-br from-teal-800 via-teal-700 to-emerald-800 text-white py-12 shadow-inner relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid-white/[0.05] pointer-events-none" />
+        <div className="max-w-7xl mx-auto px-4 relative z-10 sm:px-6 lg:px-8">
+          <span className="bg-teal-500/20 text-teal-200 border border-teal-500/30 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full">
+            Struktur Pemerintahan Desa
+          </span>
+          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight mt-3">
+            Struktur Organisasi dan Tata Kerja (SOTK)
+          </h1>
+          <p className="text-teal-100/90 mt-2 font-medium max-w-2xl text-sm sm:text-base">
+            Bagan resmi susunan jabatan, relasi struktural, dan personil {labels.namaBadan}.
           </p>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-10 space-y-8">
-        {/* Kepala Desa */}
-        <Card className="border-0 shadow-sm overflow-hidden">
-          <div className="bg-gradient-to-r from-emerald-700 to-teal-700 p-6 text-white">
-            <div className="flex flex-col md:flex-row items-center gap-6">
-              <div className="h-28 w-28 bg-white/20 rounded-full flex items-center justify-center shrink-0">
-                {pemerintahan?.fotoUrl ? (
-                  <img
-                    src={pemerintahan.fotoUrl}
-                    alt={pemerintahan.ketua || "Kepala Desa"}
-                    className="h-28 w-28 rounded-full object-cover"
-                  />
-                ) : (
-                  <User className="h-14 w-14 text-white" />
-                )}
-              </div>
-              <div className="text-center md:text-left">
-                <p className="text-sm text-emerald-200 mb-1">Kepala Desa</p>
-                <h2 className="text-2xl font-bold">
-                  {pemerintahan?.ketua || "Belum diisi"}
-                </h2>
-                <p className="text-emerald-200 mt-1">
-                  {pemerintahan?.nama || "Pemerintah Desa"}
-                </p>
-              </div>
-            </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        {/* Help Tip */}
+        <div className="mb-6 flex items-center justify-between p-4 bg-white border border-slate-100 shadow-sm rounded-2xl">
+          <div>
+            <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Petunjuk Bagan SOTK</h3>
+            <p className="text-xs text-slate-500 mt-1">Garis mengalir dari Kepala Desa menunjukkan jalur delegasi atasan ke bawahan langsung.</p>
           </div>
-        </Card>
+          <div className="text-[11px] text-slate-400 font-medium hidden sm:block">
+            Bagan menyesuaikan otomatis dengan lebar layar
+          </div>
+        </div>
 
-        {/* Struktur Organisasi Chart */}
-        <Card className="border-0 shadow-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="w-5 h-5 text-emerald-700" />
-              Bagan Struktur Organisasi
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col items-center gap-4 py-6">
-              {/* Kepala Desa */}
-              <div className="bg-emerald-700 text-white px-8 py-3 rounded-xl text-center min-w-[200px]">
-                <p className="text-xs opacity-80">Kepala Desa</p>
-                <p className="font-semibold">
-                  {pemerintahan?.ketua || "-"}
-                </p>
-              </div>
-
-              {/* Connector */}
-              <div className="w-0.5 h-6 bg-gray-300" />
-
-              {/* Sekretaris */}
-              <div className="bg-blue-600 text-white px-8 py-3 rounded-xl text-center min-w-[200px]">
-                <p className="text-xs opacity-80">Sekretaris Desa</p>
-                <p className="font-semibold">Sekdes</p>
-              </div>
-
-              {/* Connector */}
-              <div className="w-0.5 h-6 bg-gray-300" />
-
-              {/* Kasi/Kaur Level */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full max-w-3xl">
-                {[
-                  "Kasi Pemerintahan",
-                  "Kasi Kesejahteraan",
-                  "Kasi Pelayanan",
-                  "Kaur TU & Umum",
-                  "Kaur Perencanaan",
-                  "Kaur Keuangan",
-                ].map((jabatan) => (
-                  <div
-                    key={jabatan}
-                    className="bg-gray-100 border border-gray-200 text-gray-800 px-4 py-3 rounded-lg text-center"
-                  >
-                    <p className="text-[11px] font-medium">{jabatan}</p>
-                  </div>
-                ))}
-              </div>
-
-              {/* Connector */}
-              <div className="w-0.5 h-6 bg-gray-300" />
-
-              {/* Kepala Dusun */}
-              <div className="bg-orange-500 text-white px-8 py-3 rounded-xl text-center min-w-[200px]">
-                <p className="text-xs opacity-80">Kepala Dusun / Kadus</p>
-                <p className="font-semibold">5 Dusun</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Deskripsi */}
-        {pemerintahan?.deskripsi && (
-          <Card className="border-0 shadow-sm">
-            <CardHeader>
-              <CardTitle>Tugas dan Fungsi</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-700 leading-relaxed">
-                {pemerintahan.deskripsi}
-              </p>
-            </CardContent>
-          </Card>
+        {/* Chart View */}
+        {jabatanSotkList && jabatanSotkList.length > 0 ? (
+          <div className="bg-white border border-slate-100 shadow-md rounded-3xl overflow-hidden p-6 relative bg-slate-50/50">
+            <SotkUnifiedChart 
+              jabatanList={jabatanSotkList} 
+              dusunList={dusunSotkList || []} 
+            />
+          </div>
+        ) : (
+          <div className="text-center py-20 bg-white border border-slate-100 shadow-md rounded-2xl">
+            <Building2 className="w-16 h-16 text-slate-200 mx-auto mb-4" />
+            <h3 className="text-lg font-bold text-slate-700 mb-1">Struktur Organisasi Belum Diatur</h3>
+            <p className="text-slate-500 text-sm max-w-sm mx-auto">
+              Silakan tambahkan data susunan jabatan di halaman administrator terlebih dahulu.
+            </p>
+          </div>
         )}
       </div>
     </Layout>

@@ -1,0 +1,80 @@
+PANDUAN IMPLEMENTASI LENGKAP DAN DETAIL WEBSITE DESA
+(Langkah-langkah Praktis untuk Pemerintah Desa)
+
+=============================================================================
+BAGIAN 1: SPESIFIKASI PERANGKAT DAN KEBUTUHAN BIAYA
+=============================================================================
+A. Spesifikasi Komputer/Laptop (Untuk Operator Desa)
+Website ini berjalan di internet, sehingga tidak memerlukan komputer "super" untuk menjalankannya. Namun, untuk mengelola (upload data, gambar, dsb), diperlukan:
+- Prosesor: Intel Core i3 / AMD Ryzen 3 (atau setara) ke atas.
+- RAM: Minimal 4 GB (Sangat disarankan 8 GB agar lancar membuka banyak tab).
+- Penyimpanan: Ruang kosong minimal 10 GB (disarankan menggunakan SSD).
+- Koneksi Internet: Minimal 10 Mbps yang stabil (untuk proses upload gambar dan pengelolaan).
+- Browser: Google Chrome, Mozilla Firefox, atau Microsoft Edge versi terbaru.
+
+B. Rincian Biaya Implementasi (Estimasi per Tahun)
+Agar website bisa online sepenuhnya dan terlihat profesional, berikut adalah kebutuhan biayanya:
+1. Domain Resmi Desa (.desa.id): Rp 50.000 - Rp 100.000 / tahun.
+   (Syarat pendaftaran: SK Kades tentang pengangkatan Perangkat Desa, Surat Kuasa Kades, KTP Kades, dan KTP Kuasa).
+2. Server/Hosting (Cloud Platform): 
+   - Opsi Gratis (Vercel/Railway tier gratis): Rp 0 / tahun (Cukup untuk desa dengan kunjungan sedang).
+   - Opsi Berbayar (VPS/Hosting Pro): Rp 500.000 - Rp 1.500.000 / tahun (Jika pengunjung sangat padat).
+3. Database (Pusat Data): 
+   - Opsi Gratis (PlanetScale / Aiven tier gratis): Rp 0 / tahun.
+4. Total Biaya Estimasi Dasar: Rp 100.000 s/d Rp 1.500.000 / tahun (tergantung spesifikasi server yang dipilih).
+
+=============================================================================
+BAGIAN 2: STEP-BY-STEP IMPLEMENTASI AGAR ONLINE
+=============================================================================
+Ikuti panduan ini secara berurutan agar website template ini berhasil diluncurkan secara online.
+
+Langkah 1: Persiapan Akun Cloud
+Pemerintah desa melalui operator perlu mendaftar beberapa akun gratis (gunakan email resmi desa):
+1. Akun GitHub (https://github.com) - Untuk menyimpan kode sumber.
+2. Akun Vercel (https://vercel.com) - Untuk menjalankan website (server frontend/backend).
+3. Akun PlanetScale atau Aiven (https://aiven.io) - Untuk server database MySQL.
+
+Langkah 2: Menyiapkan Database
+1. Login ke penyedia database cloud (misal Aiven).
+2. Buat layanan database baru (Pilih "MySQL").
+3. Setelah berhasil dibuat, cari bagian "Connection Details" atau "Database URL".
+4. Salin (copy) link koneksi database tersebut (formatnya biasanya: mysql://username:password@host:port/namadatabase).
+5. Simpan link tersebut dengan aman, ini adalah "kunci" menuju pusat data Anda.
+
+Langkah 3: Menggandakan Kode Sumber (Repository)
+1. Buka akun GitHub yang telah dibuat.
+2. Buka link repository template Website Desa Cantik (yang diberikan oleh tim pembina).
+3. Klik tombol "Fork" atau "Use this template" di sudut kanan atas.
+4. Beri nama repository baru, contoh: "website-desa-pardomuan".
+5. Sekarang, kode sumber sudah menjadi milik akun desa Anda.
+
+Langkah 4: Meluncurkan (Deployment) di Vercel
+1. Login ke Vercel (gunakan opsi "Continue with GitHub").
+2. Di halaman utama Vercel, klik tombol "Add New..." lalu pilih "Project".
+3. Vercel akan menampilkan daftar repository GitHub Anda. Temukan "website-desa-pardomuan" dan klik "Import".
+4. Di bagian pengaturan konfigurasi (Environment Variables), Anda WAJIB menambahkan:
+   - Name: DATABASE_URL 
+   - Value: (Paste link database yang didapat pada Langkah 2)
+5. Klik tombol "Deploy".
+6. Tunggu prosesnya (sekitar 2-5 menit). Vercel akan membangun sistem, menginstal dependensi, dan mendorong struktur tabel (schema) ke database secara otomatis.
+
+Langkah 5: Mendaftarkan dan Menghubungkan Domain .desa.id
+1. Daftarkan domain desa melalui registrar resmi PANDI (misalnya di domain.id atau provider lain).
+2. Setelah disetujui dan domain aktif, buka halaman pengelolaan domain (DNS Management).
+3. Kembali ke dashboard Vercel, masuk ke proyek Anda > Settings > Domains.
+4. Masukkan nama domain desa Anda (misal: pardomuan.desa.id) lalu klik Add.
+5. Vercel akan memberikan nilai DNS (seperti CNAME atau A Record).
+6. Masukkan nilai DNS tersebut ke pengaturan DNS Management di tempat Anda membeli domain.
+7. Tunggu proses propagasi (1-24 jam). Jika berhasil, website Anda sekarang bisa diakses melalui www.pardomuan.desa.id!
+
+Langkah 6: Pengaturan Awal (Data Entry)
+Website sudah online, tapi datanya masih kosong. Waktunya mengisi data!
+1. Buka browser dan akses panel admin (contoh: pardomuan.desa.id/admin).
+2. Sistem akan meminta login. Jika ini pertama kali, ikuti proses "Setup Admin Pertama". Sistem akan mencatat akun Anda sebagai Administrator utama.
+3. Setelah masuk Dashboard Admin, langsung menuju menu:
+   - Profil Desa: Isi nama desa lengkap, visi misi, letak peta (embed google maps), dan kontak kantor desa.
+   - SOTK (Pemerintahan): Masukkan nama dan foto Kepala Desa, Sekretaris, serta para Kasi/Kaur.
+   - APBDes: Masukkan ringkasan pendapatan dan belanja tahun berjalan agar muncul di halaman depan.
+4. Lakukan penyesuaian di menu lainnya (Berita, Layanan, UMKM) secara bertahap.
+
+Selamat! Website Desa Anda kini telah online secara profesional, aman, dan siap melayani masyarakat. Pastikan untuk selalu menjaga kerahasiaan password admin.

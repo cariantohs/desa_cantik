@@ -1,0 +1,119 @@
+JALANKAN WEBSITE DESA SECARA LOKAL DI KOMPUTER BARU (UNTUK PENGGUNA AWAM)
+======================================================================
+Tujuan:
+- Supaya Anda bisa menyalin project ini ke komputer lain
+- Lalu menjalankan website dengan benar sampai browser menampilkan halaman
+
+Catatan sangat penting (penyebab paling sering gagal):
+- Project ini butuh **database MySQL** dan file konfigurasi **.env**
+- Jika file `.env` tidak ada/keliru ATAU migration belum dijalankan, website bisa tampil blank/white screen.
+
+EXTRACT PARDOMUAN.RAR DAN
+COPYKAN SELURUH FILE PARDOMUAN KE FOLDER WINDOWS EXPLORER
+======================================================================
+A. Pastikan komputer baru punya software yang dibutuhkan
+======================================================================
+1) Node.js
+- Versi disarankan: LTS
+- Cek via CMD:
+  1. Klik Start → ketik: cmd → Enter
+  2. Jalankan:
+     node -v
+     npm -v
+- Jika perintah tidak dikenal, Node.js belum terpasang.
+
+2) Browser
+- Chrome atau Edge
+
+3) MySQL Server
+- Harus sudah terpasang dan berjalan.
+install mysql-installer-community-8.0.46.0.msi
+Ketika install isi password MySQL dengan "Horas123"
+
+Buka MySQL Command Line Client dan masuk menggunakan password "Horas123".
+
+Ketik perintah berikut secara berurutan (tekan Enter di setiap barisnya):
+
+
+CREATE USER 'desa_user'@'localhost' IDENTIFIED BY 'Horas123';
+
+GRANT ALL PRIVILEGES ON desa_cantik.* TO 'desa_user'@'localhost';
+
+FLUSH PRIVILEGES;
+
+
+======================================================================
+Tujuan:
+- Membuat tabel-tabel yang dibutuhkan website
+
+Langkah:
+MASUK KE FOLDER PARDOMUAN DAN AKSES CMD DARI FOLDER TERSEBUT DAN JALANKAN SATU SATU
+
+node ./scripts/run-migration.js
+
+npm run db:migrate
+
+Jika sukses:
+- akan muncul pesan “Connected to database. Executing migration...” dan tabel dibuat.
+
+Jika gagal, penyebab paling umum:
+- DATABASE_URL salah (user/pass/host/port/db name)
+- MySQL belum jalan
+- user tidak punya permission ke database desa_cantik
+
+======================================================================
+F. Jalankan website
+======================================================================
+1) Jalankan server development:
+   npm run dev
+
+2) Buka URL yang tampil di terminal (biasanya):
+- http://localhost:3000
+
+Catatan:
+- Jika port lain, ikuti port yang tertulis di terminal.
+
+======================================================================
+G. Cek cepat (pastikan tidak blank)
+======================================================================
+Buka di browser:
+
+1) Halaman publik:
+   /
+2) Profil Geografis + cuaca:
+   /profil/geografis
+   (harap terlihat card “Iklim” berisi data cuaca)
+3) Admin profil:
+   /admin/profil
+
+Login admin (sesuai `.env` Anda):
+- Username: admin
+- Password: admin123
+
+======================================================================
+H. Kalau muncul “white screen” (solusi cepat)
+======================================================================
+1) Reload halaman (Ctrl+R)
+2) Buka DevTools:
+   - F12 → Console (lihat error merah)
+   - dan Network (lihat request gagal)
+3) Penyebab paling umum:
+   - `.env` tidak terbaca (file tidak ada / salah folder)
+   - migration belum dijalankan
+   - DATABASE_URL salah / tidak punya permission ke db
+
+======================================================================
+I. Kalau harus menjalankan di komputer lain lagi
+======================================================================
+Urutan WAJIB (jangan skip):
+1) Copy FULL project (folder utuh)
+2) npm install
+3) Pastikan file .env ada (dan DATABASE_URL benar)
+4) Pastikan MySQL database desa_cantik ada
+5) node ./scripts/run-migration.js
+6) npm run dev
+7) buka URL localhost
+
+======================================================================
+Satu kalimat penentu keberhasilan:
+PASTIKAN database MySQL + `.env` benar + migration sudah dijalankan.

@@ -21,13 +21,28 @@ import {
   X,
   ChevronRight,
   Home,
+  Palette,
+  Layers,
+  MapPin,
+  BookOpen,
+  Heart,
+  TrendingUp,
+  ChevronDown,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
-const menuItems = [
+interface MenuItem {
+  label: string;
+  path?: string;
+  icon: any;
+  submenu?: MenuItem[];
+}
+
+const menuItems: MenuItem[] = [
   { label: "Dashboard", path: "/admin", icon: LayoutDashboard },
   { label: "Profil Desa", path: "/admin/profil", icon: Settings },
   { label: "Statistik", path: "/admin/statistik", icon: BarChart3 },
+  { label: "SOTK (Struktur Org)", path: "/admin/sotk", icon: Layers },
   { label: "Berita", path: "/admin/berita", icon: Newspaper },
   { label: "Panduan", path: "/admin/panduan", icon: ClipboardList },
   { label: "Dokumen", path: "/admin/dokumen", icon: FileText },
@@ -37,6 +52,17 @@ const menuItems = [
   { label: "UMKM", path: "/admin/umkm", icon: Store },
   { label: "APBDes", path: "/admin/apbdes", icon: DollarSign },
   { label: "Pengaduan", path: "/admin/pengaduan", icon: MessageSquare },
+  {
+    label: "Potensi Desa",
+    icon: MapPin,
+    submenu: [
+      { label: "Pariwisata", path: "/admin/pariwisata", icon: MapPin },
+      { label: "Pendidikan", path: "/admin/pendidikan", icon: BookOpen },
+      { label: "Kesehatan", path: "/admin/kesehatan", icon: Heart },
+      { label: "Ekonomi", path: "/admin/ekonomi", icon: TrendingUp },
+    ],
+  },
+  { label: "Pengaturan", path: "/admin/pengaturan", icon: Palette },
 ];
 
 interface AdminLayoutProps {
@@ -50,11 +76,32 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   });
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [expandedMenus, setExpandedMenus] = useState<string[]>([]);
+
+  // Auto-expand submenu if current path is in submenu
+  useEffect(() => {
+    const currentPath = location.pathname;
+    const expandedMenu = menuItems.find(
+      (item) =>
+        item.submenu?.some((sub) => currentPath === sub.path)
+    );
+    if (expandedMenu && !expandedMenus.includes(expandedMenu.label)) {
+      setExpandedMenus([...expandedMenus, expandedMenu.label]);
+    }
+  }, [location.pathname]);
 
   // Close sidebar on route change
   useEffect(() => {
     setSidebarOpen(false);
   }, [location.pathname]);
+
+  const toggleMenu = (label: string) => {
+    setExpandedMenus((prev) =>
+      prev.includes(label)
+        ? prev.filter((item) => item !== label)
+        : [...prev, label]
+    );
+  };
 
   // Wait for auth check
   if (isLoading) {
@@ -122,19 +169,69 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         <nav className="flex-1 overflow-y-auto py-2">
           {menuItems.map((item) => {
             const isActive = location.pathname === item.path;
+            const isExpanded = expandedMenus.includes(item.label);
+            const hasSubmenu = !!item.submenu;
+            const isSubmenuActive = item.submenu?.some(
+              (sub) => location.pathname === sub.path
+            );
+
             return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
-                  isActive
-                    ? "bg-emerald-50 text-emerald-700 font-medium border-r-2 border-emerald-700"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                }`}
-              >
-                <item.icon className="h-4 w-4" />
-                {item.label}
-              </Link>
+              <div key={item.label}>
+                {hasSubmenu ? (
+                  <>
+                    <button
+                      onClick={() => toggleMenu(item.label)}
+                      className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
+                        isSubmenuActive
+                          ? "bg-emerald-50 text-emerald-700 font-medium"
+                          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      }`}
+                    >
+                      <item.icon className="h-4 w-4" />
+                      <span className="flex-1 text-left">{item.label}</span>
+                      <ChevronDown
+                        className={`h-4 w-4 transition-transform ${
+                          isExpanded ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
+                    {isExpanded && (
+                      <div className="bg-gray-50 border-l-2 border-gray-200">
+                        {item.submenu?.map((subitem) => {
+                          const isSubActive =
+                            location.pathname === subitem.path;
+                          return (
+                            <Link
+                              key={subitem.path}
+                              to={subitem.path!}
+                              className={`flex items-center gap-3 px-4 py-2 pl-10 text-sm transition-colors ${
+                                isSubActive
+                                  ? "bg-white text-emerald-700 font-medium border-r-2 border-emerald-700"
+                                  : "text-gray-600 hover:bg-white hover:text-gray-900"
+                              }`}
+                            >
+                              <subitem.icon className="h-4 w-4" />
+                              {subitem.label}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <Link
+                    to={item.path!}
+                    className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
+                      isActive
+                        ? "bg-emerald-50 text-emerald-700 font-medium border-r-2 border-emerald-700"
+                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    }`}
+                  >
+                    <item.icon className="h-4 w-4" />
+                    {item.label}
+                  </Link>
+                )}
+              </div>
             );
           })}
         </nav>
@@ -180,8 +277,24 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               <>
                 <ChevronRight className="h-3 w-3 mx-1" />
                 <span className="text-gray-900">
-                  {menuItems.find((m) => m.path === location.pathname)
-                    ?.label || ""}
+                  {(() => {
+                    // Find in direct menu items
+                    const directItem = menuItems.find(
+                      (m) => m.path === location.pathname
+                    );
+                    if (directItem) return directItem.label;
+
+                    // Find in submenu items
+                    for (const item of menuItems) {
+                      const subItem = item.submenu?.find(
+                        (s) => s.path === location.pathname
+                      );
+                      if (subItem) {
+                        return `${item.label} / ${subItem.label}`;
+                      }
+                    }
+                    return "";
+                  })()}
                 </span>
               </>
             )}

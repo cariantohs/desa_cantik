@@ -20,6 +20,7 @@ import {
 
 const statCards = [
   {
+    id: "berita",
     label: "Total Berita",
     query: "totalBerita" as const,
     icon: Newspaper,
@@ -27,6 +28,7 @@ const statCards = [
     path: "/admin/berita",
   },
   {
+    id: "pengaduan-total",
     label: "Pengaduan",
     query: "totalPengaduan" as const,
     icon: MessageSquare,
@@ -34,6 +36,7 @@ const statCards = [
     path: "/admin/pengaduan",
   },
   {
+    id: "umkm",
     label: "UMKM",
     query: "totalUmkm" as const,
     icon: Store,
@@ -41,6 +44,7 @@ const statCards = [
     path: "/admin/umkm",
   },
   {
+    id: "galeri",
     label: "Galeri",
     query: "totalGaleri" as const,
     icon: Image,
@@ -48,6 +52,7 @@ const statCards = [
     path: "/admin/galeri",
   },
   {
+    id: "lembaga",
     label: "Lembaga",
     query: "totalLembaga" as const,
     icon: Users,
@@ -55,6 +60,7 @@ const statCards = [
     path: "/admin/lembaga",
   },
   {
+    id: "pengaduan-baru",
     label: "Pengaduan Baru",
     query: "pengaduanBaru" as const,
     icon: AlertCircle,
@@ -67,6 +73,7 @@ const quickLinks = [
   { label: "Kelola Berita", path: "/admin/berita", desc: "Tambah/edit/hapus berita" },
   { label: "Kelola Profil Desa", path: "/admin/profil", desc: "Atur informasi desa" },
   { label: "Kelola Statistik", path: "/admin/statistik", desc: "Data kependudukan" },
+  { label: "Pengaturan Website", path: "/admin/pengaturan", desc: "Tema, warna, background, pejabat" },
   { label: "Lihat Pengaduan", path: "/admin/pengaduan", desc: "Respons pengaduan" },
 ];
 
@@ -87,7 +94,7 @@ export default function AdminDashboard() {
         {/* Stats Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
           {statCards.map((item) => (
-            <Link key={item.path} to={item.path}>
+            <Link key={item.id} to={item.path}>
               <Card className="border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
                 <CardContent className="p-5">
                   <div className="flex items-center justify-between">

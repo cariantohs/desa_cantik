@@ -1,0 +1,246 @@
+PANDUAN DETAIL RILIS ONLINE WEBSITE DESA CANTIK (UNTUK 2 DESA)
+======================================================================
+Tujuan:
+Membantu operator dan aparat desa meluncurkan website desa agar dapat diakses
+oleh masyarakat luas secara online (internet). Panduan ini memuat langkah demi
+langkah untuk dua skenario peluncuran desa yang berbeda:
+
+1. DESA PERTAMA (Skema Gratis -> Migrasi Berbayar): 
+   Diluncurkan pertama kali tanpa biaya sama sekali (Rp 0), lalu beralih ke 
+   skema berbayar jika anggaran desa sudah tersedia.
+2. DESA KEDUA (Skema Berbayar Optimal):
+   Diluncurkan langsung menggunakan opsi berbayar yang paling efisien, aman,
+   dan profesional sejak hari pertama dengan penghematan anggaran yang maksimal.
+
+======================================================================
+BAGIAN 1: PEMAHAMAN KOMPONEN WEBSITE (UNTUK ORANG AWAM)
+======================================================================
+Sebelum memulai langkah teknis, aparat desa perlu memahami 3 komponen utama
+agar sebuah website bisa diakses melalui HP atau komputer dari mana saja:
+
+1. DOMAIN (Alamat Website)
+   - Bagaikan papan nama atau alamat kantor desa. Contoh: "www.desasuka.id" 
+     atau "sukamaju.desa.id".
+   - Jika gratis, kita memakai alamat bawaan penyedia server seperti 
+     "desasuka.vercel.app".
+   - Jika berbayar resmi, kita mendaftarkan domain khusus instansi pemerintah 
+     yaitu ".desa.id" yang dikelola oleh pemerintah Indonesia.
+
+2. HOSTING / SERVER (Rumah Website)
+   - Tempat menyimpan kode program website agar terus berjalan 24 jam penuh.
+   - Menggunakan layanan cloud (penyimpanan awan) seperti Vercel atau VPS.
+
+3. DATABASE (Pusat Data & Lemari Arsip)
+   - Tempat menyimpan semua data teks (seperti berita, profil kades, 
+     infografis penduduk, data APBDes, pengaduan warga).
+   - Menggunakan database MySQL online agar selalu tersinkronisasi.
+
+======================================================================
+BAGIAN 2: ESTIMASI BIAYA & PILIHAN PROVIDER (OPTIMAL & HEMAT)
+======================================================================
+Tabel Estimasi Biaya Rilis (Per Tahun):
+
++----------------------+--------------------+---------------------------------------+
+| Komponen             | Skema GRATIS (Rp 0)| Skema BERBAYAR OPTIMAL (Rekomendasi)  |
++----------------------+--------------------+---------------------------------------+
+| 1. Domain            | Rp 0               | Rp 55.000 - Rp 110.000 / tahun        |
+|                      | (bawaan vercel.app)| (Domain Resmi nama-desa.desa.id)      |
++----------------------+--------------------+---------------------------------------+
+| 2. Hosting & Server  | Rp 0               | Rp 0 (Tetap Vercel Hobby Tier) ATAU    |
+|                      | (Vercel Hobby Tier)| Rp 600.000 / tahun (VPS Murah Lokal)  |
++----------------------+--------------------+---------------------------------------+
+| 3. Database MySQL    | Rp 0               | Rp 0 (Aiven Free Tier / TiDB Free)    |
+|                      | (Aiven Free Tier)  | ATAU Gabung di VPS (Rp 0 tambahan)    |
++----------------------+--------------------+---------------------------------------+
+| 4. Cloud Storage     | Rp 0               | Rp 0 (Cloudflare R2 Free Tier 10 GB)  |
+|                      | (Cloudflare R2)    |                                       |
++----------------------+--------------------+---------------------------------------+
+| ESTIMASI TOTAL BIAYA | Rp 0 / tahun       | Rp 55.000 s/d Rp 710.000 / tahun      |
++----------------------+--------------------+---------------------------------------+
+
+*Rekomendasi Terbaik untuk Desa Kedua:*
+Gunakan kombinasi Vercel (Gratis) + Aiven (Gratis) + Cloudflare R2 (Gratis) + Domain .desa.id (Berbayar). 
+Dengan kombinasi ini, desa hanya mengeluarkan biaya Rp 55.000 - Rp 110.000 per tahun untuk membeli domain resmi, sementara performa server dan keamanan datanya tetap setara website profesional.
+
+======================================================================
+BAGIAN 3: LANGKAH STEP-BY-STEP DESA PERTAMA (GRATIS -> MIGRASI BERBAYAR)
+======================================================================
+Ikuti langkah ini untuk meluncurkan website desa pertama secara GRATIS (Rp 0)
+terlebih dahulu, kemudian bermigrasi ke berbayar di masa depan.
+
+FASE A: RILIS GRATIS (RP 0)
+----------------------------------------------------------------------
+Langkah 1: Membuat Akun Layanan Cloud
+Gunakan 1 email khusus milik desa (misal: pemdes.desapertama@gmail.com).
+1) Buat akun GitHub di https://github.com (untuk menyimpan kode program).
+2) Buat akun Vercel di https://vercel.com (pilih opsi "Continue with GitHub").
+3) Buat akun Aiven di https://aiven.io (untuk database MySQL gratis).
+
+Langkah 2: Menyiapkan Database MySQL Gratis di Aiven
+1) Login ke dashboard Aiven.
+2) Klik "Create Service", pilih database "MySQL".
+3) Pilih Cloud Provider "AWS" atau "Google Cloud", dan pilih wilayah terdekat (misalnya Singapura/Singapore) agar akses cepat.
+4) Pilih Plan "Free" (Rp 0).
+5) Klik "Create Service" dan tunggu sekitar 3-5 menit sampai statusnya "Running".
+6) Di bagian "Connection Info", cari "Service URI" (URL Koneksi). Formatnya akan seperti:
+   mysql://avnadmin:password_acak@host-aiven.com:port/defaultdb?ssl-mode=REQUIRED
+7) Salin (Copy) URL koneksi tersebut dan simpan di Notepad. Ini adalah kunci database desa.
+
+Langkah 3: Mengunggah Kode Website ke GitHub Desa
+1) Buka GitHub dan login dengan akun desa.
+2) Gandakan (Fork) repository proyek ini ke GitHub desa Anda, atau buat repository baru dan unggah seluruh file proyek ini.
+3) Pastikan repository diatur ke mode "Private" (Swasta/Pribadi) agar kode dan struktur database aman dari pihak luar.
+
+Langkah 4: Meluncurkan Website di Vercel (Deploy)
+1) Buka dashboard Vercel dan login dengan akun GitHub desa.
+2) Klik tombol "Add New..." -> "Project".
+3) Temukan nama repository website desa Anda, lalu klik "Import".
+4) Pada halaman konfigurasi:
+   - Framework Preset: Pilih "Vite" (atau biarkan default).
+   - Build Command: Isi dengan `npm run build`
+   - Output Directory: Isi dengan `dist/public`
+5) Buka menu "Environment Variables" (Variabel Lingkungan), lalu tambahkan variabel berikut satu per satu:
+   - Name: DATABASE_URL
+     Value: (Tempel/Paste URL Koneksi Database dari Aiven yang disalin di Langkah 2)
+   - Name: SESSION_SECRET
+     Value: (Buat tulisan acak panjang untuk keamanan, misal: RahasiaDesaPertama123!@#)
+   - Name: ADMIN_USERNAME
+     Value: admin (Username untuk login operator pertama kali)
+   - Name: ADMIN_PASSWORD
+     Value: (Buat password aman untuk operator, misal: DesaCantikBisa123)
+6) Klik tombol "Deploy".
+7) Tunggu 2-4 menit hingga muncul kembang api pertanda sukses.
+8) Vercel akan memberikan alamat gratis, contoh: https://website-desa-pertama.vercel.app.
+9) Buka alamat tersebut di browser. Website Desa Pertama sekarang sudah ONLINE!
+
+FASE B: MIGRASI KE BERBAYAR (DI MASA DEPAN)
+----------------------------------------------------------------------
+Jika desa sudah memiliki anggaran (APBDDes), ikuti langkah migrasi berikut agar website lebih profesional dengan domain resmi pemerintah (.desa.id).
+
+Langkah 1: Siapkan Syarat Dokumen & Daftar Domain Resmi .desa.id
+1) Siapkan dokumen fisik (di-scan menjadi PDF/JPG):
+   - KTP Kepala Desa (masih berlaku).
+   - KTP Operator Desa/Penerima Kuasa.
+   - SK Pengangkatan Kepala Desa.
+   - SK Pengangkatan Perangkat Desa / Surat Kuasa dari Kades ke Operator.
+   - Surat Permohonan Domain .desa.id (Tandatangan Kades & Cap Basah - Format ada di Bagian 5).
+2) Daftar dan beli domain `.desa.id` melalui penyedia domain resmi (seperti Niagahoster, DomaiNesia, IDCloudHost, atau langsung di PANDI). Biaya sekitar Rp 55.000 - Rp 110.000 / tahun.
+3) Unggah dokumen persyaratan ke penyedia domain tersebut.
+4) Tunggu proses verifikasi dokumen oleh PANDI (biasanya 1-3 hari kerja).
+
+Langkah 2: Hubungkan Domain .desa.id ke Vercel
+Setelah domain `.desa.id` dinyatakan aktif oleh penyedia:
+1) Buka dashboard Vercel, masuk ke proyek desa pertama Anda.
+2) Klik menu "Settings" -> "Domains".
+3) Ketik domain baru Anda, misalnya: `desapertama.desa.id` lalu klik "Add".
+4) Vercel akan menampilkan petunjuk DNS berupa "A Record" dan "CNAME". Contoh:
+   - A Record: nama domain mengarah ke IP `76.76.21.21`
+   - CNAME: `www.desapertama.desa.id` mengarah ke `cname.vercel-dns.com`
+5) Buka akun penyedia tempat membeli domain tadi, masuk ke menu "DNS Management" (Kelola DNS).
+6) Tambahkan data DNS sesuai instruksi dari Vercel tersebut.
+7) Tunggu proses penyambungan (biasanya 10 menit hingga 24 jam). Jika selesai, website sekarang bisa diakses melalui alamat resmi `https://desapertama.desa.id`.
+
+======================================================================
+BAGIAN 4: LANGKAH STEP-BY-STEP DESA KEDUA (BIAYA OPTIMAL & LANGSUNG RESMI)
+======================================================================
+Desa kedua akan langsung dirilis dengan domain resmi `.desa.id` menggunakan infrastruktur yang aman namun dengan biaya tahunan yang sangat hemat.
+
+Langkah 1: Pengurusan Domain Resmi .desa.id (Sejak Awal)
+1) Siapkan dokumen administrasi desa (KTP Kades, KTP Operator, SK Kades, SK Perangkat/Surat Kuasa, Surat Permohonan).
+2) Beli domain `.desa.id` di registrar pilihan (Contoh: IDCloudHost atau Niagahoster) dengan nama desa kedua, misalnya `desakedua.desa.id` (Biaya: ~Rp 55.000 - Rp 110.000 / tahun).
+3) Selesaikan pembayaran dan unggah dokumen persyaratan. Tunggu hingga status domain aktif.
+
+Langkah 2: Menyiapkan Database dan Penyimpanan Gambar
+1) Buat akun Aiven (https://aiven.io) menggunakan email desa kedua.
+2) Buat database MySQL gratis dengan spesifikasi Free Tier (Rp 0). Simpan URL Koneksi databasenya.
+3) Buat akun Cloudflare di https://cloudflare.com.
+4) Aktifkan layanan Cloudflare R2 (Penyimpanan File) yang memberikan kapasitas 10 GB gratis selamanya. Ini akan digunakan untuk menyimpan foto-foto kegiatan desa atau dokumen layanan masyarakat tanpa memakan memori hosting.
+
+Langkah 3: Deploy Kode di Vercel & Sambungkan Domain
+1) Fork/unggah kode website ke GitHub pribadi milik operator desa kedua.
+2) Import repository tersebut ke Vercel.
+3) Masukkan Environment Variables di Vercel:
+   - `DATABASE_URL`: (Koneksi database MySQL desa kedua dari Aiven)
+   - `SESSION_SECRET`: (Kunci acak unik desa kedua)
+   - `ADMIN_USERNAME`: admin
+   - `ADMIN_PASSWORD`: (Password khusus untuk desa kedua)
+4) Selesai Deploy, masuk ke menu Settings -> Domains di Vercel.
+5) Masukkan `desakedua.desa.id` dan `www.desakedua.desa.id`.
+6) Hubungkan DNS domain tersebut di DNS Management registrar Anda sesuai petunjuk Vercel.
+7) Tunggu proses propagasi domain selesai. Website Anda langsung tayang dengan domain resmi dan aman!
+
+======================================================================
+BAGIAN 5: FORMAT DRAF SURAT PERMOHONAN DOMAIN .DESA.ID
+======================================================================
+Agar mempermudah aparat desa, berikut draf surat permohonan yang harus
+dicetak menggunakan KOP SURAT DESA, ditandatangani Kepala Desa, dan dicap basah:
+
+----------------------------------------------------------------------
+KOP SURAT PEMERINTAH KABUPATEN [NAMA KABUPATEN]
+KECAMATAN [NAMA KECAMATAN]
+KANTOR KEPALA DESA [NAMA DESA]
+Alamat: [Alamat Lengkap Kantor Desa, Kode Pos]
+----------------------------------------------------------------------
+
+Nomor   : [Nomor Surat Keluar Desa]              [Tanggal, Bulan, Tahun]
+Lampiran: 1 (satu) Berkas
+Hal     : Permohonan Pendaftaran Domain .desa.id
+
+Kepada Yth.
+Menteri Komunikasi dan Digital RI
+c.q. Pengelola Nama Domain Internet Indonesia (PANDI)
+di Jakarta
+
+Dengan hormat,
+Sehubungan dengan upaya peningkatan layanan publik dan transparansi informasi di tingkat desa berbasis teknologi informasi, kami Pemerintah Desa [Nama Desa], Kecamatan [Nama Kecamatan], Kabupaten [Nama Kabupaten] bermaksud mengajukan permohonan pendaftaran nama domain resmi instansi pemerintah desa kami yaitu:
+
+Nama Domain usulan: [nama-desa].desa.id
+
+Adapun data penanggung jawab administrasi (operator) domain ini adalah:
+Nama Lengkap  : [Nama Operator Desa]
+Jabatan       : [Jabatan Operator, misal: Kaur Umum/Operator Website]
+No. Identitas : [Nomor KTP Operator]
+No. Handphone : [Nomor HP Operator]
+Email Resmi   : [Email Resmi Desa]
+
+Bersama surat ini kami lampirkan dokumen persyaratan berupa scan KTP Kepala Desa, KTP Kuasa, SK Kepala Desa, SK Perangkat Desa / Surat Kuasa, serta surat permohonan ini untuk keperluan verifikasi.
+
+Demikian permohonan ini kami sampaikan. Atas perhatian dan kerjasamanya kami ucapkan terima kasih.
+
+
+Kepala Desa [Nama Desa]
+
+
+[Tanda Tangan & Cap Basah]
+
+
+(Nama Kepala Desa)
+----------------------------------------------------------------------
+
+======================================================================
+BAGIAN 6: PANDUAN PENGOPERASIAN Awal & PEMELIHARAAN (BAGI OPERATOR DESA)
+======================================================================
+Setelah website online, ikuti langkah awal ini:
+
+1. LOGIN ADMIN PERTAMA KALI
+   Akses alamat website Anda ditambah `/admin` di belakangnya.
+   Contoh: `https://desapertama.desa.id/admin`
+   Gunakan Username dan Password yang telah diisi pada Environment Variables
+   di Vercel saat Langkah Deploy.
+
+2. GANTI PASSWORD OPERATOR SECARA BERKALA
+   Jangan biarkan password default tetap digunakan demi keamanan website dari
+   hacker/tangan jahil. Ganti secara berkala di menu Pengaturan Akun.
+
+3. MENGELOLA UKURAN GAMBAR (PENTING!)
+   - Seringkali website menjadi sangat lambat dibuka karena operator mengunggah
+     foto kegiatan langsung dari kamera HP berukuran besar (misal 5MB - 10MB per foto).
+   - TIPS: Sebelum mengunggah foto berita atau galeri, kompres/kecilkan dahulu
+     ukuran foto tersebut menjadi di bawah 300 Kilobyte (KB). 
+   - Anda bisa menggunakan website gratis seperti https://tinypng.com untuk
+     mengecilkan ukuran foto tanpa merusak kualitasnya secara drastis.
+
+4. BACKUP DATA SECARA BERKALA
+   Meski database cloud Aiven aman, sangat disarankan bagi operator desa untuk
+   menyalin data-data penting (berita, dokumen PDF) di Google Drive desa atau
+   komputer kantor desa sebagai cadangan fisik.

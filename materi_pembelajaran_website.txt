@@ -1,0 +1,103 @@
+MATERI PEMBELAJARAN PEMBUATAN DAN PENGELOLAAN WEBSITE DESA
+(Program Pembinaan Desa Cantik - Desa Cinta Statistik 2026)
+
+=============================================================================
+BAGIAN 1: PENGANTAR WEBSITE
+=============================================================================
+1. Apa itu Website?
+Website adalah kumpulan halaman digital yang dapat diakses melalui internet menggunakan browser (seperti Google Chrome atau Mozilla Firefox). Bagi pemerintah desa, website berfungsi sebagai:
+- Papan informasi digital yang buka 24 jam.
+- Sarana transparansi publik (seperti APBDes dan statistik desa).
+- Media promosi potensi desa (UMKM, pariwisata, pertanian).
+- Pusat layanan publik secara online.
+
+2. Komponen Utama Website:
+- Domain: Nama alamat website di internet (misalnya: www.pardomuan.desa.id).
+- Hosting/Server: Komputer tempat menyimpan data-data website (teks, gambar, sistem) agar selalu online.
+- Source Code/Program: Kumpulan kode yang mengatur tampilan dan fungsi website (seperti template yang sedang kita gunakan).
+
+=============================================================================
+BAGIAN 2: ARSITEKTUR WEBSITE DESA CANTIK
+=============================================================================
+Website Desa Cantik dibangun dengan arsitektur modern yang terbagi menjadi 3 bagian utama:
+1. Frontend (Tampilan Depan)
+   Ini adalah bagian yang dilihat langsung oleh pengunjung. Mengatur tata letak warna, tombol, teks, dan animasi. 
+   Teknologi: React (untuk kerangka tampilan) dan Tailwind CSS (untuk menghias/mempercantik tampilan).
+2. Backend (Sistem Belakang)
+   Ini adalah otak dari website yang memproses data, keamanan (login), dan menghubungkan tampilan dengan tempat penyimpanan data.
+   Teknologi: Node.js dengan kerangka kerja Hono.
+3. Database (Pusat Data)
+   Ini adalah tempat penyimpanan semua informasi desa seperti artikel berita, data penduduk, profil desa, dan pengaduan masyarakat.
+   Teknologi: MySQL (Sistem manajemen basis data yang handal).
+
+=============================================================================
+BAGIAN 3: ALUR LENGKAP TAHAPAN PEMBUATAN WEBSITE DESA
+=============================================================================
+Proses pembuatan hingga website siap digunakan terbagi dalam beberapa tahapan:
+
+Tahap 1: Perencanaan & Pengumpulan Data (Tahap Persiapan)
+- Mengumpulkan data profil desa (sejarah, visi, misi).
+- Menyiapkan data SOTK (Struktur Organisasi dan Tata Kerja).
+- Menyiapkan data kependudukan (statistik, pendidikan, pekerjaan).
+- Menyiapkan foto-foto desa, logo, dan infografis APBDes.
+
+Tahap 2: Persiapan Infrastruktur (Tahap Setup)
+- Mendaftar nama domain resmi desa (berakhiran .desa.id).
+- Menyiapkan akun email resmi desa.
+- Menyiapkan server/hosting dan database online.
+
+Tahap 3: Instalasi dan Konfigurasi Program (Tahap Coding/Deploy)
+- Menyalin (clone) source code Template Website Desa Cantik.
+- Menghubungkan program dengan database yang telah dibuat.
+- Melakukan pengaturan awal (Environment Variables) agar sistem dapat berjalan di internet (Deployment).
+
+Tahap 4: Pengisian Data (Data Entry)
+- Login sebagai Administrator (Admin).
+- Memasukkan data-data yang dikumpulkan pada Tahap 1 ke dalam sistem menggunakan Panel Admin.
+- Mengunggah foto-foto potensi desa, UMKM, dan kegiatan desa.
+
+Tahap 5: Peluncuran (Launching) dan Sosialisasi
+- Website resmi dipublikasikan dan bisa diakses oleh masyarakat umum.
+- Sosialisasi kepada warga agar memanfaatkan layanan website.
+
+=============================================================================
+BAGIAN 4: PENGELOLAAN WEBSITE (UNTUK OPERATOR DESA)
+=============================================================================
+Setelah website jadi, tugas pemerintah desa (operator) adalah memastikan data selalu "hidup" dan diperbarui. 
+Melalui Panel Admin (Dashboard), operator dapat:
+- Menulis Berita: Mempublikasikan kabar desa terbaru dan pengumuman.
+- Update APBDes: Memperbarui grafik realisasi anggaran setiap tahun.
+- Mengelola Pengaduan: Membaca dan merespon aspirasi warga.
+- Tambah Potensi: Menambahkan daftar UMKM atau hasil pertanian yang baru.
+- Update Statistik: Memperbarui angka jumlah penduduk secara berkala.
+
+=============================================================================
+BAGIAN 5: PENGETAHUAN IT (TEKNOLOGI INFORMASI) YANG PERLU DIPAHAMI
+=============================================================================
+Untuk menunjang keberhasilan proyek website ini, aparat/operator desa perlu memahami beberapa konsep dasar IT berikut:
+1. Pemahaman Jaringan Internet Dasar: Mengetahui cara kerja koneksi internet (Wi-Fi, Kuota Data, Bandwidth) karena pengelolaan website sepenuhnya membutuhkan internet yang stabil.
+2. Keamanan Digital (Cybersecurity) Dasar: 
+   - Memahami pentingnya menjaga kerahasiaan kata sandi (password) akun Admin dan Email resmi desa.
+   - Menghindari membagikan hak akses sembarangan (Phishing/Penipuan).
+   - Memahami pentingnya "Logout" setelah selesai mengelola website di komputer yang dipakai bersama.
+3. Manajemen Berkas (File Management) dan Gambar: 
+   - Mampu mengelompokkan file foto/dokumen di komputer agar mudah dicari.
+   - Memahami cara mengecilkan ukuran gambar (kompresi) sebelum diunggah ke website agar website tidak lambat saat diakses warga.
+4. Pemahaman Platform Cloud (Komputasi Awan): Mengetahui bahwa data tidak lagi disimpan di komputer kantor desa, melainkan di "Cloud" (seperti Vercel dan PlanetScale/Database Cloud), sehingga website tidak akan mati meskipun komputer di balai desa dimatikan.
+
+=============================================================================
+BAGIAN 6: PENGGUNAAN AGEN CHAT AI DALAM PEMBUATAN DAN PENGEMBANGAN WEBSITE
+=============================================================================
+Dalam era digital modern, pembuatan website Desa Cantik ini dapat dipercepat dan dipermudah dengan bantuan Kecerdasan Buatan (AI), khususnya Agen Chat AI (seperti ChatGPT, Gemini, Claude, atau Agen AI khusus coding). Pemerintah desa dapat memanfaatkan AI untuk:
+1. Bantuan Penulisan Konten (Copywriting):
+   - AI dapat membantu menyusun narasi Sejarah Desa yang menarik, profesional, dan menggunakan bahasa baku.
+   - Membantu merumuskan artikel Berita Desa atau merapikan tata bahasa laporan kegiatan.
+2. Bantuan Teknis dan Pemecahan Masalah (Troubleshooting):
+   - Jika operator menemukan pesan error (kesalahan) saat mengelola atau menyebarkan (deploy) website, pesan tersebut bisa ditanyakan langsung kepada AI untuk mendapatkan solusi dan penjelasan dengan bahasa yang mudah dimengerti.
+3. Pendampingan Pengembangan Sistem (Bagi yang memiliki minat IT):
+   - AI dapat bertindak sebagai "Asisten Programmer Pribadi". Jika desa ingin menambahkan fitur baru di masa depan, operator dapat meminta AI untuk membantu membuatkan kode programnya atau memberikan panduan modifikasi langkah demi langkah.
+   - Agen AI tingkat lanjut bahkan dapat diintegrasikan dengan alat pengembangan untuk membantu menulis, memperbaiki, dan menganalisis kode secara otomatis (AI Pair Programming).
+4. Analisis Data dan Pembuatan Statistik:
+   - Sejalan dengan visi program "Desa Cantik" (Desa Cinta Statistik), AI dapat digunakan untuk memproses data mentah kependudukan, lalu merangkumnya menjadi poin-poin penting atau visualisasi menarik untuk ditampilkan di website.
+
+Materi dasar ini dirancang agar setiap aparat desa memiliki pemahaman menyeluruh tentang apa itu website, pemanfaatan teknologi AI, dan bagaimana IT dapat membantu mewujudkan tata kelola desa yang transparan, modern, dan maju.

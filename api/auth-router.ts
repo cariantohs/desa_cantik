@@ -1,7 +1,9 @@
 import * as cookie from "cookie";
 import { Session } from "@contracts/constants";
 import { getSessionCookieOptions } from "./lib/cookies";
-import { createRouter, authedQuery } from "./middleware";
+import { createRouter, authedQuery, publicQuery } from "./middleware";
+import { findUserByUsername, updateUserPassword } from "./queries/users";
+import { env } from "./lib/env";
 
 export const authRouter = createRouter({
   me: authedQuery.query((opts) => opts.ctx.user),
@@ -18,5 +20,31 @@ export const authRouter = createRouter({
       }),
     );
     return { success: true };
+  }),
+  resetPassword: publicQuery.mutation(async ({ input }) => {
+    const { username, oldPassword, newPassword } = input as {
+      username: string;
+      oldPassword: string;
+      newPassword: string;
+    };
+
+    if (!username || !oldPassword || !newPassword) {
+      throw new Error("username, oldPassword, and newPassword are required");
+    }
+
+    // Validate old password against admin credentials
+    const isValid =
+      username === env.adminUsername && oldPassword === env.adminPassword;
+    if (!isValid) {
+      throw new Error("Invalid username or old password");
+    }
+
+    // Update admin password
+    if (username === env.adminUsername) {
+      await updateUserPassword(username, newPassword);
+      return { success: true, message: "Password updated successfully" };
+    }
+
+    throw new Error("Only admin password reset is supported");
   }),
 });

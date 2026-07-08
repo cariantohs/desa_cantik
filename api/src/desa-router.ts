@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { eq, desc, asc, sql, like, and } from "drizzle-orm";
 import { createHash } from "crypto";
-import { getDb } from "./queries/connection.ts";
+import { getDb } from "./queries/connection.js";
 import {
   profilDesa,
   statistikDesa,
@@ -27,7 +27,7 @@ import {
   ekonomi,
   websiteVisits,
 } from "../../db/schema.js";
-import { createRouter, publicQuery, adminQuery, authedQuery } from "./middleware.ts";
+import { createRouter, publicQuery, adminQuery, authedQuery } from "./middleware.js";
 
 const db = () => getDb();
 

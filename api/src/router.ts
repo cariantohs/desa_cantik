@@ -1,7 +1,7 @@
-import { authRouter } from "./auth-router.ts";
-import { desaRouter } from "./desa-router.ts";
-import { sotkRouter } from "./sotk-router.ts";
-import { createRouter, publicQuery } from "./middleware.ts";
+import { authRouter } from "./auth-router.js";
+import { desaRouter } from "./desa-router.js";
+import { sotkRouter } from "./sotk-router.js";
+import { createRouter, publicQuery } from "./middleware.js";
 
 export const appRouter = createRouter({
   ping: publicQuery.query(() => ({ ok: true, ts: Date.now() })),

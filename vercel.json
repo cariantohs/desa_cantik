@@ -13,6 +13,12 @@
       "source": "/(.*)",
       "destination": "/index.html"
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/trpc/desa.pariwisata.list",
+      "schedule": "0 * * * *"
+    }
   ]
 }
 

@@ -4,7 +4,7 @@ import Layout from "@/components/Layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { MapPin, Phone, DollarSign, Star, ImageIcon } from "lucide-react";
+import { MapPin, Phone, Banknote, Star, ImageIcon } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay, A11y } from "swiper/modules";
 import "swiper/css";
@@ -83,7 +83,7 @@ export default function PariwisataPage({ type }: { type?: "penginapan" | "objek_
                     </div>
                     {item.hargaMin && item.hargaMax && (
                       <div className="flex items-center gap-1 text-sm font-semibold text-emerald-700">
-                        <DollarSign className="w-4 h-4" />
+                        <Banknote className="w-4 h-4" />
                         <span>
                           Rp {Number(item.hargaMin).toLocaleString()} - {Number(item.hargaMax).toLocaleString()}
                         </span>
@@ -147,7 +147,7 @@ export default function PariwisataPage({ type }: { type?: "penginapan" | "objek_
 
                       {selectedItem.hargaMin && selectedItem.hargaMax && (
                         <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-lg p-6 border border-emerald-200">
-                          <p className="text-gray-600 text-sm mb-2">Harga per {selectedItem.satuanHarga || "malam"}</p>
+                          <p className="text-gray-600 text-sm mb-2">Harga {selectedItem.satuanHarga || "per malam"}</p>
                           <p className="text-3xl font-bold text-emerald-700 mb-1">
                             Rp {Number(selectedItem.hargaMin).toLocaleString()} - {Number(selectedItem.hargaMax).toLocaleString()}
                           </p>

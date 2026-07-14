@@ -14,6 +14,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ImageIcon, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import SubmenuHeader from "@/components/SubmenuHeader";
+import DriveImage from "@/components/DriveImage";
 
 const kategoriLabels: Record<string, string> = {
   kegiatan: "Kegiatan",
@@ -114,7 +115,7 @@ export default function GaleriPage() {
                 onClick={() => setSelectedItem(item)}
               >
                 <div className="aspect-square overflow-hidden">
-                  <img
+                  <DriveImage
                     src={item.gambarUrl}
                     alt={item.judul}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
@@ -161,7 +162,7 @@ export default function GaleriPage() {
           {selectedItem && (
             <div className="relative">
               <div className="flex items-center justify-center min-h-[50vh] max-h-[85vh] p-4 relative group">
-                <img
+                <DriveImage
                   src={slideImages[currentSlideIndex]}
                   alt={`${selectedItem.judul} - ${currentSlideIndex + 1}`}
                   className="max-w-full max-h-[80vh] object-contain transition-opacity duration-300"

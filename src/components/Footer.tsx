@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import { trpc } from "@/providers/trpc";
 import {
+import DriveImage from "@/components/DriveImage";
   Home,
   MapPin,
   Phone,
@@ -180,7 +181,7 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto px-4 py-3">
           <div className="flex flex-col md:flex-row md:items-center md:justify-center gap-2 md:gap-4">
             {footerLogoUrl ? (
-              <img
+              <DriveImage
                 key={footerLogoUrl || "footer-logo"}
                 src={footerLogoUrl}
                 alt="Logo BPS"

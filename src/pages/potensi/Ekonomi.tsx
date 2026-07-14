@@ -11,6 +11,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import SubmenuHeader from "@/components/SubmenuHeader";
+import DriveImage from "@/components/DriveImage";
 
 const jenisLabels: Record<string, string> = {
   pasar: "Pasar",
@@ -145,7 +146,7 @@ export default function EkonomiPage() {
                 <CardContent className="p-0">
                   {/* Image */}
                   {item.fotoUrl ? (
-                    <img
+                    <DriveImage
                       src={item.fotoUrl}
                       alt={item.namaSarana}
                       className="w-full h-40 object-cover"

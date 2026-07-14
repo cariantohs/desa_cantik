@@ -1,4 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
+import { parseGoogleDriveUrl } from "@/lib/utils";
 import { trpc } from "@/providers/trpc";
 import AdminLayout from "@/components/AdminLayout";
 import { Button } from "@/components/ui/button";
@@ -30,6 +31,7 @@ import { Plus, Edit2, Trash2, Users, MapPin } from "lucide-react";
 import { toast } from "sonner";
 import { parseGoogleDriveUrl } from "@/lib/utils";
 import { getReplaceDesaTerm, useDesaStatus } from "@/hooks/useDesaStatus";
+import DriveImage from "@/components/DriveImage";
 
 export default function AdminSotkPage() {
   const utils = trpc.useUtils();
@@ -435,7 +437,7 @@ export default function AdminSotkPage() {
                       />
                       {jabatanForm.fotoUrl && (
                         <div className="mt-3 rounded-lg overflow-hidden border border-gray-200">
-                          <img
+                          <DriveImage
                             src={jabatanForm.fotoUrl}
                             alt="Preview foto pejabat"
                             className="w-full h-40 object-cover"
@@ -675,7 +677,7 @@ export default function AdminSotkPage() {
                       />
                       {dusunForm.fotoKepala && (
                         <div className="mt-3 rounded-lg overflow-hidden border border-gray-200">
-                          <img
+                          <DriveImage
                             src={dusunForm.fotoKepala}
                             alt={`Preview foto kepala ${labels.namaWilayah.toLowerCase()}`}
                             className="w-full h-40 object-cover"
@@ -816,8 +818,8 @@ export default function AdminSotkPage() {
                       </label>
                       <Input
                         value={bpdImage}
-                        onChange={(e) => setBpdImage(e.target.value)}
-                        placeholder="Contoh: https://ik.imagekit.io/.../sotk-bpd.jpg"
+                        onChange={(e) => setBpdImage(parseGoogleDriveUrl(e.target.value))}
+                        placeholder="Masukkan URL gambar atau URL Google Drive (mode view)"
                         className="w-full"
                       />
                       <p className="text-xs text-gray-500 mt-2">
@@ -827,10 +829,11 @@ export default function AdminSotkPage() {
 
                     {bpdImage && (
                       <div className="mt-4 rounded-xl overflow-hidden border border-gray-200 bg-gray-50 p-2">
-                        <img
-                          src={bpdImage}
+                        <DriveImage
+                          src={parseGoogleDriveUrl(bpdImage)}
                           alt="Preview SOTK BPD"
                           className="w-full object-contain max-h-[500px] rounded-lg"
+                          referrerPolicy="no-referrer"
                         />
                       </div>
                     )}

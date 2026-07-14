@@ -12,6 +12,7 @@ import {
   Share2,
 } from "lucide-react";
 import { Link, useParams } from "react-router";
+import DriveImage from "@/components/DriveImage";
 
 export default function BeritaDetailPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -78,7 +79,7 @@ export default function BeritaDetailPage() {
         {/* Hero Image */}
         {berita.gambarSampul && (
           <div className="rounded-xl overflow-hidden mb-6">
-            <img
+            <DriveImage
               src={berita.gambarSampul}
               alt={berita.judul}
               className="w-full h-64 md:h-96 object-cover"

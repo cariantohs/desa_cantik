@@ -7,6 +7,7 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Sprout, Fish, Beef, TreePine } from "lucide-react";
 import { useState } from "react";
+import DriveImage from "@/components/DriveImage";
 
 const jenisIcons: Record<string, typeof Sprout> = {
   pertanian: Sprout,
@@ -80,7 +81,7 @@ export default function KomoditasPage() {
                 >
                   {item.fotoUrl && (
                     <div className="h-48 overflow-hidden">
-                      <img
+                      <DriveImage
                         src={item.fotoUrl}
                         alt={item.nama}
                         className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"

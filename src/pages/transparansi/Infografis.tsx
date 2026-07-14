@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { ImageIcon, Calendar } from "lucide-react";
 import { useState } from "react";
 import SubmenuHeader from "@/components/SubmenuHeader";
+import DriveImage from "@/components/DriveImage";
 
 export default function InfografisPage() {
   const { data: galeriList } = trpc.desa.galeri.list.useQuery();
@@ -39,7 +40,7 @@ export default function InfografisPage() {
                 onClick={() => setSelectedItem(item)}
               >
                 <div className="aspect-[4/5] overflow-hidden bg-gray-50 flex items-center justify-center">
-                  <img
+                  <DriveImage
                     src={item.gambarUrl}
                     alt={item.judul}
                     className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
@@ -92,7 +93,7 @@ export default function InfografisPage() {
 
           {selectedItem && (
             <div className="relative flex h-full w-full items-center justify-center p-4 md:p-12">
-              <img
+              <DriveImage
                 src={selectedItem.gambarUrl}
                 alt={selectedItem.judul}
                 className="max-w-full max-h-[95vh] object-contain"

@@ -1,6 +1,7 @@
 import React from 'react';
 import type { SOTKNode } from './types';
 import { User } from 'lucide-react';
+import DriveImage from "@/components/DriveImage";
 
 interface OrgChartCardProps {
   node: SOTKNode;
@@ -132,7 +133,7 @@ export const OrgChartCard: React.FC<OrgChartCardProps> = ({
       {/* Photo Section */}
       <div className={`relative ${actualConfig.photoHeight} bg-slate-50 overflow-hidden border-b border-gray-100`}>
         {node.fotoUrl ? (
-          <img
+          <DriveImage
             src={node.fotoUrl}
             alt={node.pejabatNama}
             className="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-500"
@@ -197,7 +198,7 @@ export const MobileOrgChartCard: React.FC<{ node: SOTKNode }> = ({ node }) => {
       {/* Photo */}
       <div className="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 border border-teal-100 bg-slate-50">
         {node.fotoUrl ? (
-          <img
+          <DriveImage
             src={node.fotoUrl}
             alt={node.pejabatNama}
             className="w-full h-full object-cover object-top"

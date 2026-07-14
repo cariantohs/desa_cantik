@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
+import DriveImage from "@/components/DriveImage";
   Users,
   MapPin,
   Building2,
@@ -181,7 +182,7 @@ export default function Home() {
                 <Link key={berita.id} to={`/berita/${berita.slug}`} className={`group ${index < 2 ? 'md:col-span-2 lg:col-span-2' : 'lg:col-span-1'}`}>
                   <Card className="border-0 shadow-sm hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] transition-all cursor-pointer h-full overflow-hidden rounded-2xl bg-white relative">
                     <div className={`relative overflow-hidden ${index < 2 ? 'h-64' : 'h-48'}`}>
-                      <img
+                      <DriveImage
                         src={
                           berita.gambarSampul ||
                           "https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=800"
@@ -269,7 +270,7 @@ export default function Home() {
                     key={item.id}
                     className={`relative group overflow-hidden rounded-2xl ${index === 0 || index === 3 ? 'aspect-square md:aspect-[3/4]' : 'aspect-square md:aspect-square'}`}
                   >
-                    <img
+                    <DriveImage
                       src={item.gambarUrl}
                       alt={item.judul}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
@@ -308,7 +309,7 @@ export default function Home() {
                     className="border border-gray-100 shadow-sm hover:shadow-xl transition-all overflow-hidden rounded-2xl group bg-gray-50/50"
                   >
                     <div className="h-48 overflow-hidden relative p-3">
-                      <img
+                      <DriveImage
                         src={
                           item.fotoUrl ||
                           "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=400"
@@ -359,7 +360,7 @@ export default function Home() {
                   <CardContent className="p-6">
                     <div className="flex items-start gap-5">
                       {item.fotoUrl ? (
-                        <img
+                        <DriveImage
                           src={item.fotoUrl}
                           alt={item.nama}
                           className="h-16 w-16 rounded-2xl object-cover shrink-0 shadow-sm group-hover:scale-105 transition-transform"

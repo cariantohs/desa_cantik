@@ -1,4 +1,5 @@
 import { trpc } from "@/providers/trpc";
+import { parseGoogleDriveUrl } from "@/lib/utils";
 import Layout from "@/components/Layout";
 import {
   Card,
@@ -8,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Shield, Vote, Gavel } from "lucide-react";
 import SubmenuHeader from "@/components/SubmenuHeader";
+import DriveImage from "@/components/DriveImage";
 
 export default function BPDPage() {
   const { data: bpdList } = trpc.desa.lembaga.list.useQuery({ jenis: "bpd" });
@@ -33,9 +35,10 @@ export default function BPDPage() {
             </CardHeader>
             <CardContent className="p-8">
               <div className="flex justify-center">
-                <img 
-                  src={bpdImageUrl} 
+                <DriveImage 
+                  src={parseGoogleDriveUrl(bpdImageUrl)} 
                   alt="Struktur SOTK BPD" 
+                  referrerPolicy="no-referrer"
                   className="max-w-full rounded-xl shadow-md border border-gray-100 hover:scale-[1.02] transition-transform duration-300"
                 />
               </div>

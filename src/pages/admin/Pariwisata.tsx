@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/table";
 import { Plus, Pencil, Trash2, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
+import DriveImage from "@/components/DriveImage";
 
 const fasilitasLabelPrefix = "✓";
 
@@ -455,7 +456,7 @@ export default function AdminPariwisata() {
                       <TableRow key={item.id} className="hover:bg-gray-50">
                         <TableCell className="w-24">
                           {item.fotoPenginapan?.[0] ? (
-                            <img
+                            <DriveImage
                               src={item.fotoPenginapan[0]}
                               alt={item.namaPenginapan}
                               className="w-16 h-12 object-cover rounded"

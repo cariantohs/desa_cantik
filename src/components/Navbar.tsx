@@ -19,6 +19,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import DriveImage from "@/components/DriveImage";
 
 const menuItems = [
   { label: "Beranda", path: "/", icon: Home },
@@ -136,7 +137,7 @@ export default function Navbar() {
             {/* Logo */}
             <Link to="/" className="flex items-center gap-3 group shrink-0 mr-4">
               {logoUrl ? (
-                <img src={logoUrl} alt="Logo" className="h-9 w-9 rounded object-contain group-hover:scale-105 transition-transform" />
+                <DriveImage src={logoUrl} alt="Logo" className="h-9 w-9 rounded object-contain group-hover:scale-105 transition-transform" />
               ) : (
                   <div className="h-9 w-9 rounded-lg flex items-center justify-center bg-primary group-hover:scale-105 transition-transform shadow-sm">
                     <Home className="h-5 w-5 text-primary-foreground" />

@@ -12,6 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Plus, Pencil, Trash2, Image } from "lucide-react";
 import { toast } from "sonner";
 import { parseGoogleDriveUrl } from "@/lib/utils";
+import DriveImage from "@/components/DriveImage";
 
 const kategoriOptions = [
   { value: "kegiatan", label: "Kegiatan" },
@@ -102,7 +103,7 @@ export default function AdminGaleri() {
                   ) : galeriList && galeriList.length > 0 ? (
                     galeriList.map((item) => (
                       <TableRow key={item.id}>
-                        <TableCell><img src={item.gambarUrl} alt={item.judul} className="h-12 w-12 object-cover rounded" /></TableCell>
+                        <TableCell><DriveImage src={item.gambarUrl} alt={item.judul} className="h-12 w-12 object-cover rounded" /></TableCell>
                         <TableCell className="font-medium max-w-xs truncate">{item.judul}</TableCell>
                         <TableCell className="capitalize">{item.kategori}</TableCell>
                         <TableCell>

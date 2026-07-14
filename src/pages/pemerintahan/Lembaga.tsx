@@ -5,6 +5,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { Users, User, UsersRound } from "lucide-react";
+import DriveImage from "@/components/DriveImage";
 
 const jenisLabels: Record<string, { label: string; color: string }> = {
   pkk: { label: "PKK", color: "bg-pink-500" },
@@ -48,7 +49,7 @@ export default function LembagaPage() {
                 >
                   {lembaga.fotoUrl && (
                     <div className="h-44 overflow-hidden">
-                      <img
+                      <DriveImage
                         src={lembaga.fotoUrl}
                         alt={lembaga.nama}
                         className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"

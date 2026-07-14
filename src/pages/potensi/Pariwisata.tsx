@@ -11,6 +11,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import SubmenuHeader from "@/components/SubmenuHeader";
+import DriveImage from "@/components/DriveImage";
 
 export default function PariwisataPage({ type }: { type?: "penginapan" | "objek_wisata" }) {
   const { data: pariwisataList } = trpc.desa.pariwisata.list.useQuery();
@@ -114,7 +115,7 @@ export default function PariwisataPage({ type }: { type?: "penginapan" | "objek_
                       >
                         {selectedItem.fotoPenginapan.map((foto: string, idx: number) => (
                           <SwiperSlide key={idx}>
-                            <img
+                            <DriveImage
                               src={foto}
                               alt={`${selectedItem.namaPenginapan} ${idx + 1}`}
                               className="w-full h-full object-cover"

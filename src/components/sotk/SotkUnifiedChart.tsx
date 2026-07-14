@@ -1,5 +1,6 @@
 import React, { useMemo, useRef, useEffect, useState } from "react";
 import { User } from "lucide-react";
+import DriveImage from "@/components/DriveImage";
 
 export interface UnifiedSOTKNode {
   id: number | string;
@@ -321,7 +322,7 @@ export const SotkUnifiedChart: React.FC<SotkUnifiedChartProps> = ({
             />
           )}
           {node.fotoUrl ? (
-            <img
+            <DriveImage
               src={node.fotoUrl}
               alt={node.pejabatNama}
               className="w-full h-full object-cover object-top"

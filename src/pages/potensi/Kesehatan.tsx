@@ -4,6 +4,7 @@ import Layout from "@/components/Layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
+import DriveImage from "@/components/DriveImage";
   MapPin,
   Phone,
   Mail,
@@ -135,7 +136,7 @@ export default function KesehatanPage() {
                 <CardContent className="p-0">
                   {/* Image */}
                   {item.fotoUrl ? (
-                    <img
+                    <DriveImage
                       src={item.fotoUrl}
                       alt={item.namaSarana}
                       className="w-full h-40 object-cover"

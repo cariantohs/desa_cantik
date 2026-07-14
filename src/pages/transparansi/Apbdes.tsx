@@ -26,6 +26,7 @@ import {
   Cell,
 } from "recharts";
 import SubmenuHeader from "@/components/SubmenuHeader";
+import DriveImage from "@/components/DriveImage";
 
 const COLORS = ["#059669", "#0891b2", "#d97706", "#dc2626", "#7c3aed"];
 
@@ -127,7 +128,7 @@ export default function ApbdesPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <img
+                  <DriveImage
                     src={apbdesData.gambarInfografis}
                     alt={`Infografis APBDes ${tahun}`}
                     className="w-full max-w-3xl mx-auto rounded-lg"

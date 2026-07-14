@@ -19,6 +19,7 @@ import {
   Phone,
 } from "lucide-react";
 import { useState } from "react";
+import DriveImage from "@/components/DriveImage";
 
 const kategoriIcons: Record<string, typeof Store> = {
   makanan: UtensilsCrossed,
@@ -97,7 +98,7 @@ export default function UmkmPage() {
                   className="border-0 shadow-sm hover:shadow-lg transition-all overflow-hidden"
                 >
                   <div className="h-52 overflow-hidden">
-                    <img
+                    <DriveImage
                       src={
                         item.fotoUrl ||
                         "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=600"

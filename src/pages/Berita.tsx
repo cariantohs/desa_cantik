@@ -18,6 +18,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { Input } from "@/components/ui/input";
 import SubmenuHeader from "@/components/SubmenuHeader";
+import DriveImage from "@/components/DriveImage";
 
 const kategoriConfig: Record<string, { label: string; icon: typeof FileText }> = {
   semua: { label: "Semua", icon: Newspaper },
@@ -93,7 +94,7 @@ export default function BeritaPage() {
               <Link key={berita.id} to={`/berita/${berita.slug}`}>
                 <Card className="border-0 shadow-sm hover:shadow-lg transition-all cursor-pointer h-full overflow-hidden group">
                   <div className="h-48 overflow-hidden">
-                    <img
+                    <DriveImage
                       src={
                         berita.gambarSampul ||
                         "https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?w=600"

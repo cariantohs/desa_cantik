@@ -57,7 +57,12 @@ import NotFoundPage from "./pages/NotFound";
 
 export default function App() {
   // Set dynamic page title and favicon based on desa settings
-  useSiteMetadata();
+  const { isLoading } = useSiteMetadata();
+
+  // Show a completely blank layout while core database resources are loading
+  if (isLoading) {
+    return <div className="min-h-screen bg-gray-50/50 flex items-center justify-center"></div>;
+  }
 
   return (
     <>
